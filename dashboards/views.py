@@ -1,5 +1,8 @@
-from django.shortcuts import render, redirect;
+from django.shortcuts import render, redirect, get_object_or_404;
 from django.contrib.auth.decorators import login_required;
+from django.contrib.auth.mixins import LoginRequiredMixin;
+from django.views.generic import TemplateView;
+from django.contrib.auth.models import Group;
 from django.contrib import messages;
 from employee.models import Employee;
 
@@ -14,8 +17,9 @@ def home_redirect(request):
 def dashboard_redirect(request):
     try:
         employee = Employee.objects.get(user=request.user)
+
+    # User existe pero no es empleado (ej: superuser)
     except Employee.DoesNotExist:
-        # User existe pero no es empleado (ej: superuser)
         if request.user.is_superuser:
             return redirect('dashboards:admin_dashboard')
         messages.error(request, 'No employee profile found')
@@ -24,27 +28,53 @@ def dashboard_redirect(request):
     #Logica hibrida: Groups + Employee data
     user_groups = request.user.groups.values_list('name', flat=True)
 
-    #1. Admin tiene prioridad maxima
     if 'Admin' in user_groups or request.user.is_superuser:
         return redirect('dashboards:admin_dashboard')
     
-    #2. HR tiene segunda prioridad
     if 'HR' in user_groups:
         return redirect('dashboards:hr_dashboard')
-    
-    #3. Team Lead (derivado de datos)
     elif employee.is_team_lead:
         return redirect('dashboards:team_lead_dashboard')
-    
-    #4. Empleado regular
     else:
         return redirect('dashboards:employee_dashboard')
     
 
 # Stubs para las vistas especificas
-@login_required
-def employee_dashboard(request):
-    return render(request, 'dashboards/employee_dashboard.html')
+class EmployeeDashboardView(LoginRequiredMixin, TemplateView):
+    """Dashboard para empleados regulares"""
+    template_name = 'dashboards/employee_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Obtener employee asociado al user
+        employee = get_object_or_404(Employee, user=self.request.user)
+
+        # Obtener team members si es team lead (para casos hibridos)
+        team_members = []
+        if employee.is_team_lead:
+            team_members = Employee.objects.filter(
+                manager=employee
+            ).select_related('role_id', 'role_id__department_id')
+        
+        # Calcular tiempo en la empresa
+        from datetime import date
+        days_employed = (date.today() - employee.hire_date).days
+        years_employed = days_employed // 365
+
+        context.update({
+            'employee': employee,
+            'team_members': team_members,
+            'is_team_lead': employee.is_team_lead,
+            'days_employed': days_employed,
+            'years_employed': years_employed,
+        })
+
+        return context
+
+
+
+
 
 @login_required
 def team_lead_dashboard(request):

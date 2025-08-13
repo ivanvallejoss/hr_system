@@ -2,15 +2,86 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-12">
+    <div class="col-12 mb-4">
         <h2>Employee Dashboard</h2>
-        <div class="card">
+        <p class="text-muted">Welcome back, {{ employee.full_name }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-user"></i>Personal Information</h5>
+            </div>
             <div class="card-body">
-                <h5>Welcome, {{user.get_full_name}}</h5>
-                <p>This is your employee dashboard.</p>
-                <p><strong>Role:</strong> Employee</p>
+                <p><strong>Full Name:</strong> {{employee.full_name}}</p>
+                <p><strong>Email:</strong> {{employee.user.email}}</p>
+                <p><strong>Employee ID:</strong> #{{employee.id}}</p>
+                <p><strong>Hire Date:</strong> {{employee.hire_date|date:"F d, Y"}}</p>
+                <p><strong>Time Employed:</strong> {{years_employed}} year{{ years_employed|pluralize}} ({{ days_employed }} days)</p>
+                <p><strong>Status:</strong> 
+                    <span class="badge bg-success">Active</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    <!-- Role and Department Card -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mg-0"><i class="fas fa-briefcase"></i>Role & Department</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Position:</strong> {{ employee.role_id.title }}</p>
+                <p><strong>Department:</strong> {{ employee.role_id.department_id.name }}</p>
+                <p><strong>Seniority Level:</strong> 
+                    <span class="badge bg-secondary">{{ employee.get_seniority_level_display }}</span>
+                </p>
+                <p><strong>Direct Managet:</strong> 
+                    {% if employee.manager %}
+                        {{ employee.manager.full_name}}
+                    {% else %}
+                        <em>No direct manager assigned</em>
+                    {% endif %}
+                </p>
             </div>
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100" disabled>
+                            <i class="fas fa-user-edit"></i> Update Profile
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100" disabled>
+                            <i class="fas fa-calendar"></i> View Schedule
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100" disabled>
+                            <i class="fas fa-file-alt"></i> Request Leave
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100" disabled>
+                            <i class="fas fa-chart-line"></i> View Reports
+                        </button>
+                    </div>
+                </div>
+                <small class="text-muted"><em>Note: Quick actions will be implemented in future phases.</em></small>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
