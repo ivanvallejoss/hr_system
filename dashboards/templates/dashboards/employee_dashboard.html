@@ -1,0 +1,16 @@
+{% extends 'dashboards/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>Employee Dashboard</h2>
+        <div class="card">
+            <div class="card-body">
+                <h5>Welcome, {{user.get_full_name}}</h5>
+                <p>This is your employee dashboard.</p>
+                <p><strong>Role:</strong> Employee</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
