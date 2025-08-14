@@ -55,7 +55,7 @@ class EmployeeDashboardView(LoginRequiredMixin, TemplateView):
         if employee.is_team_lead:
             team_members = Employee.objects.filter(
                 manager=employee
-            ).select_related('role_id', 'role_id__department_id')
+            ).select_related('role_id__department_id')
         
         # Calcular tiempo en la empresa
         from datetime import date
@@ -72,13 +72,49 @@ class EmployeeDashboardView(LoginRequiredMixin, TemplateView):
 
         return context
 
+class TeamLeadDashboardView(EmployeeDashboardView):
+    """Dashboard para Team Leads - hereda de EmployeeDashboardView"""
+    template_name = 'dashboards/team_lead_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        #Obtener todo el contexto de Employee Dashboard
+        context = super().get_context_data(**kwargs)
+
+        # Obtener las propiedades heredadas. 
+        employee = context['employee']
+        
+        team_members = context['team_members']
+
+        # Estadisticas del equipo
+        team_stats = {
+            'total_members': len(team_members),
+            'junior_count': len([m for m in team_members if m.seniority_level == 'JUNIOR']),
+            'mid_count': len([m for m in team_members if m.seniority_level == 'MID']),
+            'senior_count': len([m for m in team_members if m.seniority_level == 'SENIOR']),
+        }
+
+        # Contexto del departamento.
+        department = employee.role_id.department_id
+
+        # Team members por departmamento (en caso de team lead cross-department)
+        team_by_department = {}
+        for member in team_members:
+            dept_name = member.role_id.department_id
+            if dept_name not in team_by_department:
+                team_by_department[dept_name] = []
+            team_by_department[dept_name].append(member)
+
+        # Enviar contexto con info de Team Lead
+        context.update({
+            'team_stats': team_stats,
+            'department': department,
+            'team_by_department': team_by_department,
+            'is_cross_deparment_lead': len(team_by_department) > 1,
+        })
+
+        return context
 
 
-
-
-@login_required
-def team_lead_dashboard(request):
-    return render(request, 'dashboards/team_lead_dashboard.html')
 
 @login_required
 def hr_dashboard(request):
