@@ -5,6 +5,7 @@ from django.views.generic import TemplateView;
 from django.contrib.auth.models import Group;
 from django.contrib import messages;
 from employee.models import Employee;
+from .mixins import EmployeeContextMixin;
 
 # Create your views here.
 
@@ -37,40 +38,19 @@ def dashboard_redirect(request):
         return redirect('dashboards:team_lead_dashboard')
     else:
         return redirect('dashboards:employee_dashboard')
-    
 
-# Stubs para las vistas especificas
-class EmployeeDashboardView(LoginRequiredMixin, TemplateView):
+
+class EmployeeDashboardView(LoginRequiredMixin, EmployeeContextMixin, TemplateView):
     """Dashboard para empleados regulares"""
     template_name = 'dashboards/employee_dashboard.html'
 
+    # Agregamos el contexto del Mixin a la vista del empleado regular
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # Obtener employee asociado al user
-        employee = get_object_or_404(Employee, user=self.request.user)
-
-        # Obtener team members si es team lead (para casos hibridos)
-        team_members = []
-        if employee.is_team_lead:
-            team_members = Employee.objects.filter(
-                manager=employee
-            ).select_related('role_id__department_id')
-        
-        # Calcular tiempo en la empresa
-        from datetime import date
-        days_employed = (date.today() - employee.hire_date).days
-        years_employed = days_employed // 365
-
-        context.update({
-            'employee': employee,
-            'team_members': team_members,
-            'is_team_lead': employee.is_team_lead,
-            'days_employed': days_employed,
-            'years_employed': years_employed,
-        })
-
+        context.update(self.get_employee_context())
+        print(context['employee'])
         return context
+
 
 class TeamLeadDashboardView(EmployeeDashboardView):
     """Dashboard para Team Leads - hereda de EmployeeDashboardView"""
@@ -80,9 +60,8 @@ class TeamLeadDashboardView(EmployeeDashboardView):
         #Obtener todo el contexto de Employee Dashboard
         context = super().get_context_data(**kwargs)
 
-        # Obtener las propiedades heredadas. 
+        # Logica especifica del Team Lead
         employee = context['employee']
-        
         team_members = context['team_members']
 
         # Estadisticas del equipo
