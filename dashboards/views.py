@@ -5,9 +5,12 @@ from django.views.generic import TemplateView;
 from django.contrib.auth.models import Group;
 from django.contrib import messages;
 from employee.models import Employee;
-from .mixins import EmployeeContextMixin;
+from .mixins import EmployeeContextMixin, HRContextMixin;
 
-# Create your views here.
+
+#
+#   PAGINA DE INICIO / REDIRECCION
+#
 
 def home_redirect(request):
     if request.user.is_authenticated:
@@ -40,6 +43,10 @@ def dashboard_redirect(request):
         return redirect('dashboards:employee_dashboard')
 
 
+#
+#   EMPLEADO / TEAM-lEAD
+#
+
 class EmployeeDashboardView(LoginRequiredMixin, EmployeeContextMixin, TemplateView):
     """Dashboard para empleados regulares"""
     template_name = 'dashboards/employee_dashboard.html'
@@ -48,7 +55,6 @@ class EmployeeDashboardView(LoginRequiredMixin, EmployeeContextMixin, TemplateVi
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(self.get_employee_context())
-        print(context['employee'])
         return context
 
 
@@ -88,16 +94,33 @@ class TeamLeadDashboardView(EmployeeDashboardView):
             'team_stats': team_stats,
             'department': department,
             'team_by_department': team_by_department,
-            'is_cross_deparment_lead': len(team_by_department) > 1,
+            'is_cross_department_lead': len(team_by_department) > 1,
+        })
+
+        return context
+
+#
+#   HR DEPARTMENT
+#
+
+class HRDashboardView(LoginRequiredMixin, HRContextMixin, TemplateView):
+    """Dashboard para usuarios de HR"""
+    template_name = 'dashboards/hr_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Agregar contexto especifico de HR
+        context.update(self.get_hr_context())
+        # Info del usuario HR actual
+        context.update({
+            'hr_user': self.request.user,
         })
 
         return context
 
 
 
-@login_required
-def hr_dashboard(request):
-    return render(request, 'dashboards/hr_dashboard.html')
 
 @login_required
 def admin_dashboard(request):
