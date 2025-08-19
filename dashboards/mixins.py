@@ -74,10 +74,26 @@ class HRContextMixin:
 
         dept_stats = Department.objects.annotate(
             employee_count=Count('role__employee', filter=models.Q(role__employee__termination_date__isnull=True)),
-            total_budget = models.F('budget')
-        ).values('name', 'employee_count', 'total_budget', 'department_manager__user__first_name', 'department_manager__user__last_name')
+            total_budget = models.F('budget'),
+            total_salaries = Sum('role__employee__current_salary', filter=models.Q(role__employee__termination_date__isnull=True)),
+            avg_salaries = Sum('role__employee__current_salary', filter=models.Q(role__employee__termination_date__isnull=True)),
+        ).values('name', 'employee_count', 'total_budget', 'total_salaries', 'avg_salaries', 'department_manager__user__first_name', 'department_manager__user__last_name')
 
-        return list(dept_stats)
+        dept_list = list(dept_stats)
+
+        for dept in dept_list:
+            if dept['total_budget'] and dept['total_salaries']:
+                # Porcentaje del budget utilizado en sueldos
+                dept['salary_budget_percentage'] = (dept['total_salaries'] / dept['total_budget']) * 100
+                # Budget restante luego de sueldos
+                dept['remaining_budget'] = dept['total_budget'] - dept['total_salaries']
+            else:
+                dept['salary_budget_percentage'] = None
+                dept['remaining_budget'] = None
+
+        return dept_list
+
+
     
     def get_recent_activity(self):
         """Actividad reciente (ultimos 30 dias)"""

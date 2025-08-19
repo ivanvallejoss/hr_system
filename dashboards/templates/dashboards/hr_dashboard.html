@@ -128,8 +128,10 @@
                                     <th>Department</th>
                                     <th>Manager</th>
                                     <th>Employees</th>
+                                    <th>Total Salaries</th>
+                                    <th>Avg. Salaries</th>
                                     <th>Budget</th>
-                                    <th>Avg. Cost per Employee</th>
+                                    <th>Budget Usages</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -147,15 +149,35 @@
                                             <span class="badge bg-primary">{{ dept.employee_count }}</span>
                                         </td>
                                         <td>
-                                            {% if dept.total_budget %}
-                                                ${{ dept.total_budget|floatformat:0 }}
+                                            {% if dept.total_salaries %}
+                                                ${{ dept.total_salaries|floatformat:0 }}
                                             {% else %}
-                                                <em class="text-muted">Not set</em>
+                                                <em class="text-muted">Not salaries</em>
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if dept.total_budget and dept.employee_count > 0 %}
+                                            {% if dept.avg_salary %}
+                                                ${{ dept.avg_salary|floatformat:0 }}
+                                            {% else %}
+                                                <em class="text-muted">N/A</em>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if dept.total_budget %}
                                                 ${{ dept.total_budget|floatformat:0 }}
+                                            {% else %}
+                                                <em class="text-muted">N/A</em>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if dept.salary_budget_percentage %}
+                                                {% if dept.salary_budget_percentage > 80 %}
+                                                    <span class="badge bg-danger">{{ dept.salary_budget_percentage|floatformat:1 }}%</span>
+                                                {% elif dept.salary_budget_percentage > 60 %}
+                                                    <span class="badge bg-waning text-dark">{{ dept.salary_budget_percentage|floatformat:1 }}%</span>
+                                                {% else %}
+                                                    <span class="badge bg-success">{{ dept.salary_budget_percentage|floatformat:1 }}%</span>
+                                                {% endif %}
                                             {% else %}
                                                 <em class="text-muted">N/A</em>
                                             {% endif %}
