@@ -30,11 +30,11 @@
     <div class="col-md-6 mb-4">
         <div class="card h-100">
             <div class="card-header bg-info text-white">
-                <h5 class="mg-0"><i class="fas fa-briefcase"></i>Role & Department</h5>
+                <h5 class="mb-0"><i class="fas fa-briefcase"></i>Role & Department</h5>
             </div>
             <div class="card-body">
-                <p><strong>Position:</strong> {{ employee.role_id.title }}</p>
-                <p><strong>Department:</strong> {{ employee.role_id.department_id.name }}</p>
+                <p><strong>Position:</strong> {{ employee.role.title }}</p>
+                <p><strong>Department:</strong> {{ employee.role.department.name }}</p>
                 <p><strong>Seniority Level:</strong> 
                     <span class="badge bg-secondary">{{ employee.get_seniority_level_display }}</span>
                 </p>
@@ -147,7 +147,7 @@
                                         {% for member in team_members %}
                                         <tr>
                                             <td><strong>{{ member.full_name }}</strong></td>
-                                            <td>{{ member.role_id.title }}</td>
+                                            <td>{{ member.role.title }}</td>
                                             <td><span class="badge bg-light text-dark">{{ member.get_seniority_level_display }}</span></td>
                                             <td>{{ member.hire_date|date:"M d, Y" }}</td>
                                             <td><small>{{ member.user.email }}</small></td>
@@ -173,7 +173,7 @@
                                     {% for member in team_members %}
                                     <tr>
                                         <td><strong>{{ member.full_name }}</strong></td>
-                                        <td>{{ member.role_id.title }}</td>
+                                        <td>{{ member.role.title }}</td>
                                         <td><span class="badge bg-light text-dark">{{member.get_seniority_level_display }}</span></td>
                                         <td>{{member.hire_date|date:"M d, Y" }}</td>
                                         <td>{{ member.user.email }}</td>

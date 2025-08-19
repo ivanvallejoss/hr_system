@@ -28,16 +28,16 @@ class Department(TimeStampedModel):
     
 class Role(TimeStampedModel):
     title = models.CharField(max_length=100)
-    department_id = models.ForeignKey(Department, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)
     description = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.title} - {self.department_id.name}"
+        return f"{self.title} - {self.department.name}"
     
     
 class Employee(TimeStampedModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role_id = models.ForeignKey(Role, on_delete=models.PROTECT)
+    role = models.ForeignKey(Role, on_delete=models.PROTECT)
     seniority_level = models.CharField(
         max_length=10,
         choices=SENIORITY_CHOICES,
@@ -55,7 +55,7 @@ class Employee(TimeStampedModel):
     termination_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.get_full_name()} - {self.role_id.title}"
+        return f"{self.user.get_full_name()} - {self.role.title}"
     
     @property
     def is_active(self):

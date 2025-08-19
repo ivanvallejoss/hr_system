@@ -79,12 +79,12 @@ class TeamLeadDashboardView(EmployeeDashboardView):
         }
 
         # Contexto del departamento.
-        department = employee.role_id.department_id
+        department = employee.role.department
 
         # Team members por departmamento (en caso de team lead cross-department)
         team_by_department = {}
         for member in team_members:
-            dept_name = member.role_id.department_id
+            dept_name = member.role.department
             if dept_name not in team_by_department:
                 team_by_department[dept_name] = []
             team_by_department[dept_name].append(member)

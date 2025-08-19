@@ -33,8 +33,8 @@
                 <h5 class="mg-0"><i class="fas fa-briefcase"></i>Role & Department</h5>
             </div>
             <div class="card-body">
-                <p><strong>Position:</strong> {{ employee.role_id.title }}</p>
-                <p><strong>Department:</strong> {{ employee.role_id.department_id.name }}</p>
+                <p><strong>Position:</strong> {{ employee.role.title }}</p>
+                <p><strong>Department:</strong> {{ employee.role.department.name }}</p>
                 <p><strong>Seniority Level:</strong> 
                     <span class="badge bg-secondary">{{ employee.get_seniority_level_display }}</span>
                 </p>

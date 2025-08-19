@@ -1,12 +1,10 @@
-from django.db import models;
 from django.shortcuts import get_object_or_404;
-from employee.models import Employee, Department;
+from employee.models import Employee;
 
 class EmployeeContextMixin:
     """Mixin para agregar contexto relacionado con empleados"""
     
     def get_employee(self):
-        # Obtenemos el empleado
         return get_object_or_404(Employee, user=self.request.user)
     
     def get_team_members(self, employee):
@@ -15,7 +13,7 @@ class EmployeeContextMixin:
             return Employee.objects.none()
         return Employee.objects.filter(
             manager=employee
-        ).select_related('role_id__department_id')
+        ).select_related('role__department')
     
     def get_employment_duration(self, employee):
         """Calcula el tiempo que lleva el empleado en la empresa"""
@@ -40,61 +38,7 @@ class EmployeeContextMixin:
         
 class HRContextMixin:
     """Mixin que agrega contexto especifico para HR Dashboard"""
-
-    def get_company_stats(self):
-        """Estadisticas generales de la empresa"""
-        from django.db.models import Count, Sum;
-
-        total_employee = Employee.objects.filter(termination_date__isnull=True).count()
-
-        # Stats para seniority
-        seniority_stats = Employee.objects.filter(
-            termination_date__isnull=True
-        ).values('seniority_level').annotate(
-            count=Count('id')
-        )
-
-        # Convertir a dict para template
-        seniority_breakdown = {
-            'JUNIOR': 0,
-            'MID': 0,
-            'SENIOR': 0
-        }
-        for stat in seniority_stats:
-            seniority_breakdown[stat['seniority_level']] = stat['count']
-
-        return {
-            'total_employee': total_employee,
-            'seniority_breakdown': seniority_breakdown,
-        }
-    
-    def get_department_stats(self):
-        """Estadisticas por departamento"""
-        from django.db.models import Count, Sum;
-
-        dept_stats = Department.objects.annotate(
-            employee_count=Count('role__employee', filter=models.Q(role__employee__termination_date__isnull=True)),
-            total_budget = models.F('budget'),
-            total_salaries = Sum('role__employee__current_salary', filter=models.Q(role__employee__termination_date__isnull=True)),
-            avg_salaries = Sum('role__employee__current_salary', filter=models.Q(role__employee__termination_date__isnull=True)),
-        ).values('name', 'employee_count', 'total_budget', 'total_salaries', 'avg_salaries', 'department_manager__user__first_name', 'department_manager__user__last_name')
-
-        dept_list = list(dept_stats)
-
-        for dept in dept_list:
-            if dept['total_budget'] and dept['total_salaries']:
-                # Porcentaje del budget utilizado en sueldos
-                dept['salary_budget_percentage'] = (dept['total_salaries'] / dept['total_budget']) * 100
-                # Budget restante luego de sueldos
-                dept['remaining_budget'] = dept['total_budget'] - dept['total_salaries']
-            else:
-                dept['salary_budget_percentage'] = None
-                dept['remaining_budget'] = None
-
-        return dept_list
-
-
-    
+        
     def get_recent_activity(self):
         """Actividad reciente (ultimos 30 dias)"""
         from datetime import date, timedelta;
@@ -103,7 +47,7 @@ class HRContextMixin:
 
         recent_hires = Employee.objects.filter(
             hire_date__gte = a_month_ago
-        ).select_related('user', 'role_id__department_id').order_by('-hire_date')
+        ).select_related('user', 'role__department').order_by('-hire_date')
 
         return {
             'recent_hires': recent_hires,
@@ -112,10 +56,16 @@ class HRContextMixin:
     
     def get_hr_context(self):
         """Metodo convenience que combina todo el contexto HR"""
+        from employee.services import DepartmentStatsService, CompanyStatsService;
+
         context = {}
-        context.update(self.get_company_stats())
+
+        # Obtener Estadisticas de la empresa
+        context.update(CompanyStatsService.get_overview())
+
+        # Obteniendo estadisticas de los departamentos 
         context.update({
-            'department_stats': self.get_department_stats(),
+            'department_stats': DepartmentStatsService.get_overview(),
             'recent_hires':self.get_recent_activity(),
             **self.get_recent_activity()
         })
