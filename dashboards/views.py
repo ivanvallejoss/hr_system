@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404;
+from django.shortcuts import redirect;
 from django.contrib.auth.decorators import login_required;
 from django.contrib.auth.mixins import LoginRequiredMixin;
 from django.views.generic import TemplateView;
-from django.contrib.auth.models import Group;
 from django.contrib import messages;
-from employee.models import Employee;
+from django.contrib.auth.models import User, Group;
+from employee.models import Department, Employee;
 from .mixins import EmployeeContextMixin, HRContextMixin;
 
 
@@ -120,8 +120,64 @@ class HRDashboardView(LoginRequiredMixin, HRContextMixin, TemplateView):
         return context
 
 
+#
+#   ADMIN
+#
 
+class AdminDashboardView(LoginRequiredMixin, TemplateView):
+    """Dashboard para administradores del sistema"""
+    template_name = 'dashboards/admin_dashboard.html'
 
-@login_required
-def admin_dashboard(request):
-    return render(request, 'dashboards/admin_dashboard.html')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        from employee.services import CompanyStatsService;
+
+        # System Overview Stats
+        total_users = User.objects.count()
+        total_employees = Employee.objects.filter(termination_date__isnull=True).count()
+        total_departments = Department.objects.count()
+
+        # User Management Stats
+        users_without_profile = self.get_users_without_profile()
+        group_distribution = self.get_group_distribution()
+        recent_users = self.get_recent_users()
+
+        # Company stats from service
+        company_stats = CompanyStatsService.get_overview()
+
+        context.update({
+            # System overview
+            'total_users': total_users,
+            'total_employees': total_employees,
+            'total_departments': total_departments,
+            'users_without_profile_count': users_without_profile.count(),
+
+            # User Management
+            'users_without_profile': users_without_profile[:5], # No entiendo porque pero top 5 para mostrar
+            'group_distribution': group_distribution,
+            'recent_users': recent_users,
+
+            # Company data
+            **company_stats,
+
+            # Admin user info
+            'admin_user': self.request.user,
+        })
+
+        return context
+    
+    def get_users_without_profile(self):
+        """Usuarios sin Employee profile asociado"""
+        return User.objects.filter(employee__isnull=True).select_related().order_by('-date_joined')
+    
+    def get_group_distribution(self):
+        """Distribucion de usuarios sin grupo"""
+        from django.db.models import Count;
+        return Group.objects.annotate(user_count=Count('user')).values('name', 'user_count')
+    
+    def get_recent_users(self):
+        """Usuarios creados en los ultimos 30 dias"""
+        from datetime import date, timedelta;  
+        a_month_ago = date.today() - timedelta(days=30)
+        return User.objects.filter(date_joined__gte=a_month_ago).order_by('-date_joined')[:10]

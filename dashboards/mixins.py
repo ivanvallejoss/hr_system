@@ -60,13 +60,10 @@ class HRContextMixin:
 
         context = {}
 
-        # Obtener Estadisticas de la empresa
-        context.update(CompanyStatsService.get_overview())
-
-        # Obteniendo estadisticas de los departamentos 
+        # Obtenemos estadisticas: department_stats - recent_hires/recent_hires_count - total_employee/seniority_breakdown. En ese orden.
         context.update({
             'department_stats': DepartmentStatsService.get_overview(),
-            'recent_hires':self.get_recent_activity(),
-            **self.get_recent_activity()
+            **self.get_recent_activity(),
+            **CompanyStatsService.get_overview(),
         })
         return context
