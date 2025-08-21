@@ -68,7 +68,7 @@ class EmployeeDashboardView(LoginRequiredMixin, EmployeeContextMixin, TemplateVi
                 'label': 'View Schedule',
                 'icon': 'fas fa-calendar',
                 'disabled': True,
-                'col-size': '3'
+                'col_size': '3'
             },
             {
                 'label': 'Request Leave',

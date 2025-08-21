@@ -17,7 +17,7 @@
                                     {{ action.label }}
                                 </a>
                             {% else %}
-                                <button class="btn {{ action.btn_class|default:"btn-outline-primary" }}w-100"
+                                <button class="btn {{ action.btn_class|default:"btn-outline-primary" }} w-100"
                                 {% if action.disabled %} disabled {% endif %}>
                                 {% if action.icon %} <i class="{{ action.icon }}"></i>{% endif %}
                                 {{ action.label }}

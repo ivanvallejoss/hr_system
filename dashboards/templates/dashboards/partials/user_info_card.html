@@ -8,7 +8,7 @@
             <p><strong>Email:</strong> {{ employee.user.email}}</p>
             <p><strong>Employee ID:</strong> {{ employee.id}}</p>
             <p><strong>Hire date:</strong> {{ employee.hire_date|date:"F d, Y"}}</p>
-            <p><strong>Time employed:</strong> {{ years_employed }}</p>
+            <p><strong>Time employed:</strong> {{ years_employed }} year{{ years_employed|pluralize }} ({{ days_employed }} days)</p>
             <p><strong>Status:</strong> 
                 <span class="badge bg-success">Activate</span>
                 {% if is_team_lead %}
