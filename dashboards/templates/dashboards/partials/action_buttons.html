@@ -1,0 +1,35 @@
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header {{ header_bg_class|default:'bg-light' }}">
+                <h5 class="mb-0">
+                    {% if section_icon %} <i class="{{ section_icon }}"></i> {% endif %}
+                    {{ section_title }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for action in actions %}
+                        <div class="col-md-{{ action.col_size|default:'3'}} mb-2">
+                            {% if action.url %}
+                                <a href="{{ action.url }}" class="btn {{ action.btn_class|default:"btn-outline-primary" }} w-100">
+                                    {% if action.icon %} <i class="{{action.icon}}"></i> {% endif %}
+                                    {{ action.label }}
+                                </a>
+                            {% else %}
+                                <button class="btn {{ action.btn_class|default:"btn-outline-primary" }}w-100"
+                                {% if action.disabled %} disabled {% endif %}>
+                                {% if action.icon %} <i class="{{ action.icon }}"></i>{% endif %}
+                                {{ action.label }}
+                                </button>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if section_note %}
+                    <small class="text-muted"><em>{{ section_note }}</em></small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

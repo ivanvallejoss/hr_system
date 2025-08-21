@@ -1,0 +1,20 @@
+<div class="col-md-6 mb-4">
+    <div class="card h-100">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-user"></i> Personal information.</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Full Name:</strong> {{ employee.full_name}}</p>
+            <p><strong>Email:</strong> {{ employee.user.email}}</p>
+            <p><strong>Employee ID:</strong> {{ employee.id}}</p>
+            <p><strong>Hire date:</strong> {{ employee.hire_date|date:"F d, Y"}}</p>
+            <p><strong>Time employed:</strong> {{ years_employed }}</p>
+            <p><strong>Status:</strong> 
+                <span class="badge bg-success">Activate</span>
+                {% if is_team_lead %}
+                    <span class="badge bg-warning text-dark">Team Lead</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>

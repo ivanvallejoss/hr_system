@@ -55,6 +55,34 @@ class EmployeeDashboardView(LoginRequiredMixin, EmployeeContextMixin, TemplateVi
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(self.get_employee_context())
+
+        # Datos para action buttons
+        context['quick_actions']= [
+            {
+                'label':'Update Profile',
+                'icon': 'fas fa-user-edit',
+                'disabled': True,
+                'col_size': '3'
+            },
+            {
+                'label': 'View Schedule',
+                'icon': 'fas fa-calendar',
+                'disabled': True,
+                'col-size': '3'
+            },
+            {
+                'label': 'Request Leave',
+                'icon': 'fas fa-file-alt',
+                'disabled': True,
+                'col_size': '3'
+            },
+            {
+                'label': 'View Reports',
+                'icon': 'fas fa-chart-line',
+                'disabled': True,
+                'col_size': '3'
+            }
+        ]
         return context
 
 
@@ -91,10 +119,42 @@ class TeamLeadDashboardView(EmployeeDashboardView):
 
         # Enviar contexto con info de Team Lead
         context.update({
-            'team_stats': team_stats,
-            'department': department,
-            'team_by_department': team_by_department,
-            'is_cross_department_lead': len(team_by_department) > 1,
+            'team_overview_data':{
+                'main_number': team_stats['total_members'],
+                'main_label': 'Total Team Members',
+                'breakdown': {
+                    'junior': team_stats['junior_count'],
+                    'mid': team_stats['mid_count'],
+                    'senior': team_stats['senior_count']
+                }
+            },
+            'leadership_actions': [
+                {
+                    'label': 'Add Team Member',
+                    'icon': 'fas fa-user-plus',
+                    'disabled': True,
+                    'col_size': '6'
+                },
+                {
+                    'label': 'Schedule Team Meetings',
+                    'icon': 'fas fa-calendar-check',
+                    'col_size': '6'
+                },
+                {
+                    'label': 'Perfomance Reviews',
+                    'icon': 'fas fa-star',
+                    'disabled': True,
+                    'col_size': '6'
+                },
+            ],
+            'team_table_headers': ['Name', 'Role', 'Seniority', 'Hire Date', 'Email'],
+            'team_table_data':[[
+                f"<strong>{member.full_name}</strong>",
+                member.role.title,
+                f'<span class="badge bg-light text-dark">{member.get_seniority_level_display()}</span>',
+                member.hire_date.strftime("%b %d, %Y"),
+                member.user.email
+            ] for member in team_members]
         })
 
         return context
