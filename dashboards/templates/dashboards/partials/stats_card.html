@@ -1,0 +1,47 @@
+<div class="col-md-{{ card_size|default:"4" }} mb-4">
+    <div class="card h-100">
+        <div class="card-header {{ header_bg_class }} text-white">
+            <h5 class="mb-0">
+                {% if card_icon %} <i class="{{ card_icon }}"></i>{% endif %}
+                {{ card_title }}
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if stats_data %}
+                {% if card_type == "overview" %}
+                    <div class="row text-center">
+                        <div class="col-12 mb-3">
+                            <h2 class="text-primary">{{ stats_data.main_number }}</h2>
+                            <small class="text-muted">{{ stats_data.main_label }}</small>
+                        </div>
+                    </div>
+                    {% if stats_data.breakdown %}
+                        <hr>
+                        <div class="row text-center">
+                            {% for key, value in stats_data.breakdown.items %}
+                                <div class="col-4">
+                                    <h5 class="text-{{ key|lower }}">{{ value }}</h5>
+                                    <small>{{ key|title }}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% elif card_type == "system" %}
+                    <div class="row text-center">
+                        {% for item in stats_data %}
+                            <div class="col-4">
+                                <h4 class="text-{{ item.color }}">{{ item.value }}</h4>
+                                <small>{{ item.label }}</small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            {% if card_extra_content %}
+                <hr>
+                {{ card_extra_content|safe }}
+            {% endif %}
+        </div>
+    </div>
+</div>

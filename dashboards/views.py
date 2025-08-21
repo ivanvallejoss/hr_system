@@ -55,6 +55,34 @@ class EmployeeDashboardView(LoginRequiredMixin, EmployeeContextMixin, TemplateVi
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(self.get_employee_context())
+
+        # Datos para action buttons
+        context['quick_actions']= [
+            {
+                'label':'Update Profile',
+                'icon': 'fas fa-user-edit',
+                'disabled': True,
+                'col_size': '3'
+            },
+            {
+                'label': 'View Schedule',
+                'icon': 'fas fa-calendar',
+                'disabled': True,
+                'col_size': '3'
+            },
+            {
+                'label': 'Request Leave',
+                'icon': 'fas fa-file-alt',
+                'disabled': True,
+                'col_size': '3'
+            },
+            {
+                'label': 'View Reports',
+                'icon': 'fas fa-chart-line',
+                'disabled': True,
+                'col_size': '3'
+            }
+        ]
         return context
 
 
@@ -91,10 +119,42 @@ class TeamLeadDashboardView(EmployeeDashboardView):
 
         # Enviar contexto con info de Team Lead
         context.update({
-            'team_stats': team_stats,
-            'department': department,
-            'team_by_department': team_by_department,
-            'is_cross_department_lead': len(team_by_department) > 1,
+            'team_overview_data':{
+                'main_number': team_stats['total_members'],
+                'main_label': 'Total Team Members',
+                'breakdown': {
+                    'junior': team_stats['junior_count'],
+                    'mid': team_stats['mid_count'],
+                    'senior': team_stats['senior_count']
+                }
+            },
+            'leadership_actions': [
+                {
+                    'label': 'Add Team Member',
+                    'icon': 'fas fa-user-plus',
+                    'disabled': True,
+                    'col_size': '6'
+                },
+                {
+                    'label': 'Schedule Team Meetings',
+                    'icon': 'fas fa-calendar-check',
+                    'col_size': '6'
+                },
+                {
+                    'label': 'Perfomance Reviews',
+                    'icon': 'fas fa-star',
+                    'disabled': True,
+                    'col_size': '6'
+                },
+            ],
+            'team_table_headers': ['Name', 'Role', 'Seniority', 'Hire Date', 'Email'],
+            'team_table_data':[[
+                f"<strong>{member.full_name}</strong>",
+                member.role.title,
+                f'<span class="badge bg-light text-dark">{member.get_seniority_level_display()}</span>',
+                member.hire_date.strftime("%b %d, %Y"),
+                member.user.email
+            ] for member in team_members]
         })
 
         return context
@@ -110,11 +170,56 @@ class HRDashboardView(LoginRequiredMixin, HRContextMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Agregar contexto especifico de HR
         context.update(self.get_hr_context())
-        # Info del usuario HR actual
+
+        # Info templates.
         context.update({
             'hr_user': self.request.user,
+            'company_overview_data':{
+                'main_number': context.get('total_employee', 0),
+                'main_label': 'Active Employees',
+                'breakdown': {
+                    'junior': context.get('seniority_breakdown', {}).get('JUNIOR', 0),
+                    'mid': context.get('seniority_breakdown', {}).get('MID', 0),
+                    'senior': context.get('seniority_breakdown', {}).get('SENIOR', 0)
+                }
+            },
+            'hr_actions': [
+                {
+                    'label': 'Add Employee',
+                    'icon': 'fas fa-user-plus',
+                    'disabled': True,
+                    'col_size': '3'
+                },
+                {
+                    'label': 'Manage Departments',
+                    'icon': 'fas fa-building',
+                    'disabled': True,
+                    'col_size': '3'
+                },
+                {
+                    'label': 'Generate Reports',
+                    'icon': 'fas fa-chart-bar',
+                    'disabled': True,
+                    'col_size': '3'
+                },
+                {
+                    'label': 'HR Settings',
+                    'icon': 'fas fa-cog',
+                    'disabled': True,
+                    'col_size': '3'
+                },
+            ],
+            'dept_table_headers': ['Department', 'Manager', 'Employees', 'Total Salaries', 'Avg. Salaries', 'Budget', 'Budget Usage'],
+            'dept_table_data': [[
+                f"<strong>{dept['name']}</strong>",
+                f"{dept['department_manager__user__first_name']} {dept['department_manager__user__last_name']}" if dept['department_manager__user__first_name'] else '<em class="text-muted">No manager assigned</em>',
+                f'<span class="badge bg-primary">{dept['employee_count']}</span>',
+                f"${dept['total_salaries']:,.0f}" if dept['total_salaries'] else '<em class="text-muted>No salaries</em>',
+                f"${dept['avg_salaries']:,.0f}" if dept['avg_salaries'] else '<em class="text-muted>N/A</em>',
+                f"${dept['total_budget']:,.0f}" if dept['total_budget'] else '<em class="text-muted>N/A</em>',
+                f'<span class="badge bg-{"danger" if dept['salary_budget_percentage'] and dept["salary_budget_percentage"] > 80 else "warning" if dept["salary_budget_percentage"] and dept["salary_budget_percentage"] > 60 else "success"}">{dept["salary_budget_percentage"]:.1f}%</span>' if dept.get('salary_budget_percentage') else '<em class="text-muted">N/A</em>'
+            ] for dept in context.get('department_stats', [])]
         })
 
         return context

@@ -1,202 +1,44 @@
 {% extends 'dashboards/base.html' %}
 
 {% block content %}
+    {% include 'dashboards/partials/dashboard_header.html' with dashboard_title="HR Management Dashboard" dashboard_subtitle="Welcome back, "|add:hr_user.get_full_name|default:hr_user.username|add:" | Manage your workforce efficiently" %}
 
-<div class="row">
-    <div class="col-12 mb-4">
-        <h2>HR Management Dashboard</h2>
-        <p class="text-muted">Welcome back, {{hr_user.get_full_name|default:hr_user.username }} | Manage your workforce efficiently</p>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-building"></i>Company Overview</h5>
-            </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-12 mb-3">
-                        <h2 class="text-primary">{{ total_employee }}</h2>
-                        <small class="text-muted">Active Employees</small>
-                    </div>
+    <div class="row">
+        {% include 'dashboards/partials/stats_card.html' with card_size="4" card_title="Company Overview" card_icon="fas fa-building" header_bg_class="bg-primary" card_type="overview" stats_data=company_overview_data %}
+        
+        <div class="col-md-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-clock"></i> Recent Activity (Last 30 days)</h5>
                 </div>
-                <hr>
-                <div class="row text-center">
-                    <div class="col-4">
-                        <h5 class="text-info">{{ seniority_breakdown.JUNIOR }}</h5>
-                        <small>Junior</small>
-                    </div>
-                    <div class="col-4">
-                        <h5 class="text-warning">{{ seniority_breakdown.MID }}</h5>
-                        <small>Mid</small>
-                    </div>
-                    <div class="col-4">
-                        <h5 class="text-success">{{ seniority_breakdown.SENIOR }}</h5>
-                        <small>Senior</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Activity Card -->
-     <div class="col-md-8 mb-4">
-        <div class="card w-100">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-clock"></i>Recent Activity (Last 30 days)</h5>
-            </div>
-            <div class="card-body">
-                {% if recent_hires_count > 0 %}
-                    <p class="mb-3"><strong>{{ recent_hires_count }} new hire{{ recent_hires_count|pluralize }}</strong> in the last 30 days</p>
-                    <div class="row">
-                        {% for hire in recent_hires %}
-                            <div class="col-md-6 mb-2">
-                                <div class="card border-light">
-                                    <div class="card-body py-2">
-                                        <h6 class="card-title mb-1">{{ hire.full_name }}</h6>
-                                        <small class="text-muted">{{ hire.role.title }} - {{ hire.role.department.name }}</small>
-                                        <small class="text-success">Hired: {{ hire.hire_date|date:"M d, Y" }}</small>
+                <div class="card-body">
+                    {% if recent_hires_count > 0 %}
+                        <p class="mb-3"><strong>{{ recent_hires_count }} new hire{{ recent_hires_count|pluralize }}</strong> in the last 30 days</p>
+                        <div class="row">
+                            {% for hire in recent_hires %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="card border-light">
+                                        <div class="card-body py-2">
+                                            <h6 class="card-title mb-1">{{ hire.full_name }}</h6>
+                                            <small class="text-muted">{{ hire.role.title }} - {{ hire.role.department.name }}</small><br>
+                                            <small class="text-success">Hired: {{ hire.hire_date|date:"M d, Y" }}</small>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="text-center py-3">
-                        <i class="fas fa-user-plus fa-2x text-muted mb-2"></i>
-                        <p class="text-muted mb-0">No new hires in the last 30 days</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-     </div>
-</div>
-
-<!-- HR actions Row -->
-
-<div class="row">
-    <div class="col-12 mb-4">
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="fas fa-tools"></i> HR Management Tools</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 mb-2">
-                        <button class="btn btn-outline-primary w-100" disabled>
-                            <i class="fas fa-user-plus"></i> Add Employee
-                        </button>
-                    </div>
-                    <div class="col-md-3 mb-2">
-                        <button class="btn btn-outline-success w-100" disabled>
-                            <i class="fas fa-building"></i> Manage Departments
-                        </button>
-                    </div>
-                    <div class="col-md-3 mb-2">
-                        <button class="btn btn-outline-warning w-100" disabled>
-                            <i class="fas fa-chart-bar"></i> Generate Reports
-                        </button>
-                    </div>
-                    <div class="col-md-3 mb-2">
-                        <button class="btn btn-outline-danger w-100" disabled>
-                            <i class="fas fa-cog"></i> HR Settings
-                        </button>
-                    </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-user-plus fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No new hires in the last 30 days</p>
+                        </div>
+                    {% endif %}
                 </div>
-                <small class="text-muted"> <em>HR management tools will be implemented in future phases.</em></small>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Department Stats Row -->
+    {% include 'dashboards/partials/action_buttons.html' with section_title="HR Management Tools" section_icon="fas fa-tools" header_bg_class="bg-info text-white" actions=hr_actions section_note="HR management tools will be implemented in future phases." %}
 
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0"><i class="fas fa-sitemap"></i> Department Overview</h5>
-            </div>
-            <div class="card-body">
-                {% if department_stats  %}
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Department</th>
-                                    <th>Manager</th>
-                                    <th>Employees</th>
-                                    <th>Total Salaries</th>
-                                    <th>Avg. Salaries</th>
-                                    <th>Budget</th>
-                                    <th>Budget Usages</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for dept in department_stats %}
-                                    <tr>
-                                        <td><strong>{{ dept.name }}</strong></td>
-                                        <td>
-                                            {% if dept.department_manager__user__first_name %}
-                                                {{ dept.department_manager__user__first_name }} {{ dept.department_manager__user__last_name }}
-                                            {% else %}
-                                                <em class="text-muted">No manager assigned</em>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-primary">{{ dept.employee_count }}</span>
-                                        </td>
-                                        <td>
-                                            {% if dept.total_salaries %}
-                                                ${{ dept.total_salaries|floatformat:0 }}
-                                            {% else %}
-                                                <em class="text-muted">Not salaries</em>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if dept.avg_salaries %}
-                                                ${{ dept.avg_salaries|floatformat:0 }}
-                                            {% else %}
-                                                <em class="text-muted">N/A</em>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if dept.total_budget %}
-                                                ${{ dept.total_budget|floatformat:0 }}
-                                            {% else %}
-                                                <em class="text-muted">N/A</em>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if dept.salary_budget_percentage %}
-                                                {% if dept.salary_budget_percentage > 80 %}
-                                                    <span class="badge bg-danger">{{ dept.salary_budget_percentage|floatformat:1 }}%</span>
-                                                {% elif dept.salary_budget_percentage > 60 %}
-                                                    <span class="badge bg-waning text-dark">{{ dept.salary_budget_percentage|floatformat:1 }}%</span>
-                                                {% else %}
-                                                    <span class="badge bg-success">{{ dept.salary_budget_percentage|floatformat:1 }}%</span>
-                                                {% endif %}
-                                            {% else %}
-                                                <em class="text-muted">N/A</em>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-building fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">No Departments Found</h5>
-                        <p class="text-muted">Create departments to see statistics here.</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
+    {% include 'dashboards/partials/data_table.html' with table_title="Department Overview" table_icon="fas fa-sitemap" table_headers=dept_table_headers table_data=dept_table_data empty_title="No Departments Found" empty_message="Create departments to see statistics here." empty_icon="fas fa-building" %}
 {% endblock %}

@@ -1,14 +1,8 @@
 from django.db import models;
 from django.contrib.auth.models import User;
 from core.models import TimeStampedModel;
+from core.constants import SENIORITY_LEVELS;
 
-
-
-SENIORITY_CHOICES = [
-    ('JUNIOR', 'Junior'),
-    ('MID', 'Mid'),
-    ('SENIOR', 'Senior')
-]
 
 class Department(TimeStampedModel):
     name = models.CharField(max_length=100, unique=True)
@@ -40,7 +34,7 @@ class Employee(TimeStampedModel):
     role = models.ForeignKey(Role, on_delete=models.PROTECT)
     seniority_level = models.CharField(
         max_length=10,
-        choices=SENIORITY_CHOICES,
+        choices=SENIORITY_LEVELS,
         default='JUNIOR'
     )
     manager = models.ForeignKey(
