@@ -1,6 +1,6 @@
 from django.db import models;
-from django.db.models import Count, Sum, Avg;
-from .models import Employee, Department, Role;
+from django.db.models import Count, Sum;
+from .models import Employee, Department;
 
 class DepartmentStatsService:
     """Service para calculos relacionados con estadisticas de departamentos"""
@@ -59,4 +59,27 @@ class CompanyStatsService:
         return {
             'total_employee': total_employee,
             'seniority_breakdown': seniority_breakdown,
+        }
+    
+
+from core.utils import get_recent_date_threshold;
+from core.constants import RECENT_ACTIVITY_DAYS;
+
+class HRActivityService:
+    """Service para actividad reciente de HR"""
+
+    @staticmethod
+    def get_recent_hires(days=None):
+        """Contrataciones recientes"""
+        if days is None:
+            days = RECENT_ACTIVITY_DAYS
+
+        recent_threshold = get_recent_date_threshold(days)
+        recent_hires = Employee.objects.filter(
+            hire_date__gte=recent_threshold
+        ).select_related('user', 'role__department').order_by('-hire_date')
+
+        return {
+            'recent_hires': recent_hires,
+            'recent_hires_count': recent_hires.count(),
         }

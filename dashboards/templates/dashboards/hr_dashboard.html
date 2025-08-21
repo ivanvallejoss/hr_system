@@ -174,7 +174,7 @@
                                                 {% if dept.salary_budget_percentage > 80 %}
                                                     <span class="badge bg-danger">{{ dept.salary_budget_percentage|floatformat:1 }}%</span>
                                                 {% elif dept.salary_budget_percentage > 60 %}
-                                                    <span class="badge bg-waning text-dark">{{ dept.salary_budget_percentage|floatformat:1 }}%</span>
+                                                    <span class="badge bg-warning text-dark">{{ dept.salary_budget_percentage|floatformat:1 }}%</span>
                                                 {% else %}
                                                     <span class="badge bg-success">{{ dept.salary_budget_percentage|floatformat:1 }}%</span>
                                                 {% endif %}

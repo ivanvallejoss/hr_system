@@ -17,7 +17,7 @@ class RoleAdmin(admin.ModelAdmin):
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ['full_name', 'role', 'seniority_level', 'manager', 'is_active']
+    list_display = ['full_name', 'get_role', 'seniority_level', 'manager', 'is_active']
     list_filter = ['seniority_level', 'role__department', 'hire_date']
     search_fields = ['user__first_name', 'user__last_name']
 
@@ -26,6 +26,6 @@ class EmployeeAdmin(admin.ModelAdmin):
     get_role.short_description = 'Role & Department'
 
     def get_is_active(self, obj):
-        return obj.is_Active
+        return obj.is_active
     get_is_active.boolean = True
     get_is_active.short_description = 'Active'
