@@ -170,11 +170,56 @@ class HRDashboardView(LoginRequiredMixin, HRContextMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Agregar contexto especifico de HR
         context.update(self.get_hr_context())
-        # Info del usuario HR actual
+
+        # Info templates.
         context.update({
             'hr_user': self.request.user,
+            'company_overview_data':{
+                'main_number': context.get('total_employee', 0),
+                'main_label': 'Active Employees',
+                'breakdown': {
+                    'junior': context.get('seniority_breakdown', {}).get('JUNIOR', 0),
+                    'mid': context.get('seniority_breakdown', {}).get('MID', 0),
+                    'senior': context.get('seniority_breakdown', {}).get('SENIOR', 0)
+                }
+            },
+            'hr_actions': [
+                {
+                    'label': 'Add Employee',
+                    'icon': 'fas fa-user-plus',
+                    'disabled': True,
+                    'col_size': '3'
+                },
+                {
+                    'label': 'Manage Departments',
+                    'icon': 'fas fa-building',
+                    'disabled': True,
+                    'col_size': '3'
+                },
+                {
+                    'label': 'Generate Reports',
+                    'icon': 'fas fa-chart-bar',
+                    'disabled': True,
+                    'col_size': '3'
+                },
+                {
+                    'label': 'HR Settings',
+                    'icon': 'fas fa-cog',
+                    'disabled': True,
+                    'col_size': '3'
+                },
+            ],
+            'dept_table_headers': ['Department', 'Manager', 'Employees', 'Total Salaries', 'Avg. Salaries', 'Budget', 'Budget Usage'],
+            'dept_table_data': [[
+                f"<strong>{dept['name']}</strong>",
+                f"{dept['department_manager__user__first_name']} {dept['department_manager__user__last_name']}" if dept['department_manager__user__first_name'] else '<em class="text-muted">No manager assigned</em>',
+                f'<span class="badge bg-primary">{dept['employee_count']}</span>',
+                f"${dept['total_salaries']:,.0f}" if dept['total_salaries'] else '<em class="text-muted>No salaries</em>',
+                f"${dept['avg_salaries']:,.0f}" if dept['avg_salaries'] else '<em class="text-muted>N/A</em>',
+                f"${dept['total_budget']:,.0f}" if dept['total_budget'] else '<em class="text-muted>N/A</em>',
+                f'<span class="badge bg-{"danger" if dept['salary_budget_percentage'] and dept["salary_budget_percentage"] > 80 else "warning" if dept["salary_budget_percentage"] and dept["salary_budget_percentage"] > 60 else "success"}">{dept["salary_budget_percentage"]:.1f}%</span>' if dept.get('salary_budget_percentage') else '<em class="text-muted">N/A</em>'
+            ] for dept in context.get('department_stats', [])]
         })
 
         return context
