@@ -1,3 +1,8 @@
+"""
+Logica para servir las estadisticas por area. Mas relacionado a la logica de negocio
+"""
+
+
 from django.db import models;
 from django.db.models import Count, Sum;
 from .models import Employee, Department;
