@@ -1,5 +1,5 @@
 """
-Services especificos para dashboards.
+Logica para servir en la vista de los dashboards.
 """
 
 from datetime import date, timedelta;
@@ -95,3 +95,57 @@ class EmployeeDashboardService:
                 team_by_department[dept_name] = []
             team_by_department[dept_name].append(member)
         return team_by_department
+    
+
+import logging
+from core.exceptions import DataIntegrityError, EmployeeNotFoundError, InactiveEmployeeError, InsufficientPermissionError;
+
+logger = logging.getLogger(__name__)
+
+class ValidationService:
+    """Service para validaciones de datos"""
+
+    @staticmethod
+    def validate_employee_access(user):
+        """
+        Valida que un usuario tenga acceso como empleado
+        """
+        if not user.is_authenticated:
+            raise PermissionError("User not authenticated") # No estoy muy seguro de esta linea, en teoria deberia ser PermissionDenied ??
+        
+        try:
+            employee = user.employee
+            if not employee.is_active:
+                raise InactiveEmployeeError(f"Employee {user.username} is not active")
+            return employee
+        except Employee.DoesNotExist:
+            raise EmployeeNotFoundError(f"No employee profle for user {user.username}")
+        
+    @staticmethod
+    def validate_team_lead_access(user):
+        """
+        Valida que un usuario tenga acceso como team lead
+        """
+        employee = ValidationService.validate_employee_access(user)
+        if not employee.is_team_lead:
+            raise InsufficientPermissionError(f"User {user.username} is not a team lead")
+        return employee
+    
+    @staticmethod
+    def validate_group_membership(user, required_groups):
+        """
+        Valida que un usuario pertenezca a los grupos requeridos
+        """
+
+        if user.is_superuser:
+            return True
+        
+        user_groups = set(user.groups.values_list('name', flat=True))
+        required_groups = set(required_groups)
+
+        if not user_groups.intersection(required_groups):
+            raise InsufficientPermissionError(
+                f"User {user.username} lacks required groups: {required_groups}"
+            )
+        return True
+    

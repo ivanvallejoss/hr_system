@@ -13,9 +13,16 @@ class EmployeeContextMixin:
         
         team_members = EmployeeDashboardService.get_team_members(employee)
 
+        # Verificamos si tiene empleados asignados para generar stats o enviar un objeto vacio
+        if len(team_members) > 0:
+            team_stats = EmployeeDashboardService.get_team_stats(team_members)
+        else:
+            team_stats = None
+
         context = {
             'employee': employee,
             'team_members': team_members,
+            'team_stats': team_stats,
             'is_team_lead': employee.is_team_lead,
             **calculate_employment_duration(employee.hire_date),
         }
