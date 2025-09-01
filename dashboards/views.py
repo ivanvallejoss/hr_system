@@ -297,7 +297,7 @@ class HRDashboardView(SafeViewMixin, HRRequiredMixin, HRContextMixin, TemplateVi
 #   ADMIN
 #
 
-class AdminDashboardView(LoginRequiredMixin, TemplateView):
+class AdminDashboardView(SafeViewMixin, AdminRequiredMixin, TemplateView):
     """Dashboard para administradores del sistema"""
     template_name = 'dashboards/admin_dashboard.html'
     fallback_url = 'dashboards:home'
