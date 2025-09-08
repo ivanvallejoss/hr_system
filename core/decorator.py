@@ -58,7 +58,7 @@ def group_required(*group_name):
         def _wrapped_view(request, *args, **kwargs):
             try:
                 user_groups = set(request.user.groups.values_list('name', flat=True))
-                required_groups = set(group_names)
+                required_groups = set(group_name)
 
                 # Superuser siempre tiene acceso
                 if request.user.is_superuser:
@@ -67,7 +67,7 @@ def group_required(*group_name):
                 # Verificar si el usuario pertenece a alguno de los grupos.
                 if not user_groups.intersection(required_groups):
                     logger.warning(f"User {request.user.username} denied access. Required: {required_groups}, Has: {user_groups}")
-                    raise PermissionDenied(f"Access denied. Required groups: {', '.join(group_names)}")
+                    raise PermissionDenied(f"Access denied. Required groups: {', '.join(group_name)}")
                 
                 return view_func(request, *args, **kwargs)
             
