@@ -77,12 +77,14 @@ class EmployeeDashboardView(SafeViewMixin, EmployeeRequiredMixin, EmployeeContex
         context = super().get_context_data(**kwargs)
 
         try:
+            # Intentamos obtener el contexto especifico del empleado.
             employee_context = self.get_employee_context()
             if not employee_context.get('employee'):
                 logger.error(f"No employee context for user {self.request.user.username}")
                 messages.error(self.request, 'Coul not load employee information.')
                 return context
             
+            # Si lo obtenemos, lo cargamos al contexto.
             context.update(employee_context)
 
             # Datos para action buttons
@@ -129,25 +131,19 @@ class TeamLeadDashboardView(SafeViewMixin, TeamLeadRequiredMixin, EmployeeContex
         context = super().get_context_data(**kwargs)
 
         try:
-            # Intentamos obtener el contexto especifico del team lead
+            print("Entrando al try")
             employee_context = self.get_employee_context()
             if not employee_context.get('employee'):
-                logger.error(f"No employee context for tema lead {self.request.user.username}")
+                logger.error(f"No employee context for team lead {self.request.user.username}")
                 return context
             
-            # Si lo obtenemos, cargarlo al contexto.
+            print("Employee context obtenido")
+            
             context.update(employee_context)
 
-            # Obtener los miembros del equipo.
+            # Obtener los miembros del equipo y sus estadisticas.
             team_members = context['team_members']
-
-            # Estadisticas del equipo
-            team_stats = {
-                'total_members': len(team_members),
-                'junior_count': len([m for m in team_members if m.seniority_level == 'JUNIOR']),
-                'mid_count': len([m for m in team_members if m.seniority_level == 'MID']),
-                'senior_count': len([m for m in team_members if m.seniority_level == 'SENIOR']),
-            }
+            team_stats = context['team_stats']
 
             # Enviar contexto con info de Team Lead
             context.update({
@@ -211,8 +207,6 @@ class HRDashboardView(SafeViewMixin, HRRequiredMixin, HRContextMixin, TemplateVi
             # Agregar contexto especifico de HR
             hr_context = self.get_hr_context()
             context.update(hr_context)
-
-
 
             # Info templates.
             context.update({

@@ -65,7 +65,7 @@ class GroupRequiredMixin(UserPassesTestMixin):
         has_permission = bool(user_groups.intersection(required_groups))
 
         if not has_permission:
-            logger.warning(f"User {self.requerst.username} denied access. Required: {required_groups}, Has: {user_groups}")
+            logger.warning(f"User {self.request.username} denied access. Required: {required_groups}, Has: {user_groups}")
 
         return has_permission
     
