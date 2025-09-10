@@ -1,10 +1,9 @@
 from django.shortcuts import redirect;
 from django.contrib.auth.decorators import login_required;
-from django.contrib.auth.mixins import LoginRequiredMixin;
 from django.views.generic import TemplateView;
 from django.contrib import messages;
 from django.contrib.auth.models import User, Group;
-from employee.models import Department, Employee;
+from employee.models import Employee;
 from .mixins import EmployeeContextMixin, HRContextMixin;
 from core.mixins import (
     EmployeeRequiredMixin,
@@ -247,7 +246,7 @@ class HRDashboardView(SafeViewMixin, HRRequiredMixin, HRContextMixin, TemplateVi
                     },
                 ],
                 'dept_table_headers': ['Department', 'Manager', 'Employees', 'Total Salaries', 'Avg. Salaries', 'Budget', 'Budget Usage'],
-                'dept_table_data': self._format_department_table_data(context.get('department_stats, []'))
+                'dept_table_data': self._format_department_table_data(context.get('department_stats', []))
             })
 
         except Exception as e:
