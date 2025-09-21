@@ -2,7 +2,7 @@
 Logica para servir en la vista de los dashboards.
 """
 
-from datetime import date, timedelta;
+from django.core.cache import cache;
 from django.contrib.auth.models import User, Group;
 from django.db.models import Count;
 from employee.models import Employee, Department;
@@ -19,37 +19,73 @@ class UserManagementService:
     @staticmethod
     def get_system_overview():
         """Obtiene estadisticas generales del sistema"""
-        return {
+        cache_key = 'system_overview'
+        cached_result = cache.get(cache_key)
+
+        if cached_result is not None:
+            return cached_result
+
+        result = {
             'total_users': User.objects.count(),
             'total_employees': Employee.objects.filter(termination_date__isnull=True).count(),
             'total_departments': Department.objects.count(),
         }
+
+        cache.set(cache_key, result, 300)
+        return result
     
     @staticmethod
     def get_users_without_profile():
         """Usuarios sin Employee profile asociado"""
-        return User.objects.filter(
+        cache_key = 'users_without_profile'
+        cached_result = cache.get(cache_key)
+
+        if cached_result is not None:
+            return cached_result
+        
+        users = User.objects.filter(
             employee__isnull=True
         ).select_related().order_by('-date_joined')
+
+        cache.set(cache_key, list(users), 600)
+        return users
     
     @staticmethod
     def get_group_distribution():
         """Distribucion de usuarios por grupo"""
-        return Group.objects.annotate(
+        cache_key = 'group_distribution'
+        cached_result = cache.get(cache_key)
+
+        if cached_result is not None:
+            return cached_result
+
+        groups = Group.objects.annotate(
             user_count=Count('user')
         ).values('name', 'user_count')
-    
+
+        cache.set(cache_key, list(groups), 900)
+        return groups
+
+
     @staticmethod
     def get_recent_users(limit=None):
         """Usuarios creados recientemente"""
         if limit is None:
             limit = DEFAULT_RECENT_ITEMS_LIMIT
         
+        cache_key = f'recent_users_{limit}'
+        cached_result = cache.get(cache_key)
+        
+        if cached_result is not None:
+            return cached_result
+        
         recent_threshold = get_recent_date_threshold()
-        return User.objects.filter(
+        users = User.objects.filter(
             date_joined__gte=recent_threshold
         ).select_related('employee').order_by('-date_joined')[:limit]
-    
+        
+        cache.set(cache_key, users, 600)
+        return users
     
 class EmployeeDashboardService:
     """Service para logica especifica de employee dashboard"""
@@ -57,10 +93,19 @@ class EmployeeDashboardService:
     @staticmethod
     def get_employee_by_user(user):
         """Obtiene empleado por usuario con manejo de errores"""
+        cache_key = f'employee_data_{user.id}'
+        cached_result = cache.get(cache_key)
+
+        if cached_result is not None:
+            return cached_result
+        
         try:
-            return Employee.objects.select_related(
+            employee = Employee.objects.select_related(
                 'role__department', 'manager__user'
             ).get(user=user)
+
+            cache.set(cache_key, employee, 900)
+            return employee
         except Employee.DoesNotExist:
             return None
         
@@ -70,30 +115,65 @@ class EmployeeDashboardService:
         if not employee or not employee.is_team_lead:
             return Employee.objects.none()
         
-        return Employee.objects.filter(
+        cache_key = f'team_members_{employee.id}'
+        cached_result = cache.get(cache_key)
+
+        if cached_result is not None:
+            return cached_result
+        
+        team_members_list = Employee.objects.filter(
             manager=employee
         ).select_related('role__department', 'user')
+
+        cache.set(cache_key,team_members_list, 600)
+        return team_members_list
 
     @staticmethod
     def get_team_stats(team_members):
         """Estadisticas del equipo"""
+
+        cache_key = 'team_stats'
+        cached_result = cache.get(cache_key)
+        if cached_result is not None:
+            return cached_result
+
         total_members = len(team_members)
-        return {
-            'total_members': total_members,
-            'junior_count': len([m for m in team_members if m.seniority_level == 'JUNIOR']),
-            'mid_count': len([m for m in team_members if m.seniority_level == 'MID']),
-            'senior_count': len([m for m in team_members if m.seniority_level == 'SENIOR']),
+
+        seniorities = {
+            'JUNIOR':0,
+            'MID':0,
+            'SENIOR':0,
         }
+        for m in team_members:
+            seniorities[m['seniority_level']] += 1
+
+        team_stats = {
+            'total_members': total_members,
+            'junior_count': seniorities['JUNIOR'],
+            'mid_count': seniorities['MID'],
+            'senior_count': seniorities['SENIOR'],
+        }
+
+        cache.set(cache_key, team_stats, 600)
+        return team_stats
     
     @staticmethod
     def get_team_by_department(team_members):
         """Agrupa team members por departamento"""
+        cache_key = 'team_by_department'
+        cached_result = cache.get(cache_key)
+
+        if cached_result is not None:
+            return cached_result
+        
         team_by_department = {}
         for member in team_members:
             dept_name = member.role.department.name
             if dept_name not in team_by_department:
                 team_by_department[dept_name] = []
             team_by_department[dept_name].append(member)
+        
+        cache.set(cache_key, team_by_department, 600)
         return team_by_department
     
 

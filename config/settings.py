@@ -9,8 +9,8 @@ import environ;
 import os;
 import sys;
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # Configuracion de environ
 env = environ.Env(
@@ -25,16 +25,10 @@ environ.Env.read_env(BASE_DIR / '.env')
 
 
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -59,6 +53,17 @@ MIDDLEWARE = [
     'core.middleware.SecurityHeadersMiddleware',
     'core.middleware.EmployeeProfileMiddleware'
 ]
+
+# En caso de estar en el entorno de desarrollo de DEBUG, agregamos debug_toolbar como app instalada.
+DEBUG = env('DEBUG')
+
+if DEBUG:
+    INSTALLED_APPS += ['debug_toolbar']
+    MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
+    import socket
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips ] + ["127.0.0.1", "10.0.2.2"] 
+
 
 ROOT_URLCONF = 'config.urls'
 
