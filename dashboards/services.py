@@ -145,7 +145,7 @@ class EmployeeDashboardService:
             'SENIOR':0,
         }
         for m in team_members:
-            seniorities[m['seniority_level']] += 1
+            seniorities[m.seniority_level] += 1
 
         team_stats = {
             'total_members': total_members,
