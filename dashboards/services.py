@@ -48,7 +48,7 @@ class UserManagementService:
         ).select_related().order_by('-date_joined')
 
         cache.set(cache_key, list(users), 600)
-        return users
+        return list(users)
     
     @staticmethod
     def get_group_distribution():

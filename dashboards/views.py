@@ -316,7 +316,7 @@ class AdminDashboardView(SafeViewMixin, AdminRequiredMixin, TemplateView):
             context.update({
                 # System overview
                 **system_stats,
-                'user_without_profile_count': users_without_profile.count(),
+                'user_without_profile_count': len(users_without_profile),
 
                 # User Management
                 'users_without_profile': users_without_profile[:5], # No entiendo porque pero top 5 para mostrar
