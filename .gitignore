@@ -5,3 +5,12 @@ __pycache__/
 db.sqlite3 
 .DS_Store
 logs/
+*.log
+*.pot
+local_settings.py
+/static/
+/media/
+htmlcov/
+.coverage
+.pytest_cache/
+staticfiles/

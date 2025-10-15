@@ -59,7 +59,7 @@ DEBUG = env('DEBUG')
 
 if DEBUG:
     INSTALLED_APPS += ['debug_toolbar']
-    MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
     import socket
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips ] + ["127.0.0.1", "10.0.2.2"] 
@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
-# Detectar si estamos ejecutando tests
+# Detectamos si estamos ejecutando tests.
 
 TESTING = 'test' in sys.argv or 'pytest' in sys.modules
 
@@ -226,3 +226,29 @@ LOGGING = {
 
 # creamos directorio de logs si no existe
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
+
+
+#
+# ==== PRODUCTION SETTINGS ====
+#
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Whitenoise configuration (para servir archivos estaticos)
+if not DEBUG:
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Database configuration con dj-database-url (para Railway/Render)
+import dj_database_url
+
+if not DEBUG:
+    # En produccion, usar DATABASE_URL si esta disponible
+    database_url = env.get_value('DATABASE_URL', default=None)
+    if database_url:
+        DATABASES['default'] = dj_database_url.config(
+            default=database_url,
+            conn_max_age=600,
+            conn_health_checks=True        )

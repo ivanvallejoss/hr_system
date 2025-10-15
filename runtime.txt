@@ -1,0 +1,8 @@
+python-3.11.7
+
+```
+### **2 Crear `Procfile` (para Railway/Render)**
+```
+
+web: gunicorn config.wsgi --log-file -
+release: python manage.py migrate
