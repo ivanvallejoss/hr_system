@@ -309,6 +309,8 @@ class AdminDashboardView(SafeViewMixin, AdminRequiredMixin, TemplateView):
 
             # User Management Stats
             users_without_profile = UserManagementService.get_users_without_profile()
+            print("HOLA, LUGARN DE PRUEBA")
+            print(users_without_profile)
             group_distribution = UserManagementService.get_group_distribution()
             recent_users = UserManagementService.get_recent_users()
 
@@ -316,10 +318,10 @@ class AdminDashboardView(SafeViewMixin, AdminRequiredMixin, TemplateView):
             context.update({
                 # System overview
                 **system_stats,
-                'user_without_profile_count': len(users_without_profile),
+                'users_without_profile_count': len(users_without_profile),
 
                 # User Management
-                'users_without_profile': users_without_profile[:5], # No entiendo porque pero top 5 para mostrar
+                'users_without_profile': users_without_profile, # No entiendo porque pero top 5 para mostrar
                 'group_distribution': group_distribution,
                 'recent_users': recent_users,
 

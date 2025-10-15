@@ -33,7 +33,7 @@
                 <hr>
                 <div class="text-center">
                     <p class="mb-1"><strong>Company Health:</strong></p>
-                        {% if users_without_profile_count > 0 %}
+                        {% if users_without_profile_count %}
                             <span class="badge bg-warning text-dark">{{ users_without_profile_count }} users need profiles.</span>
                         {% else %}
                             <span class="badge bg-success">All users have profiles</span>
