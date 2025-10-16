@@ -13,7 +13,30 @@ Diseñado para gestionar empleados, departamentos, roles y jerarquías organizac
 
 <!-- SECCION 3: SCREENSHOTS + GIFS -->
 
-    <!-- FALTA SUBIR BIEN LOS SCREENSHOTS -->
+## Vista Previa
+<div align="center">
+    <img src="docs/screenshots/screenshot_hr_dashboard.png" alt="System Overview" width="800">
+    <p><em>Dashboard principal con metricas en tiempo real</em></p>
+</div>
+
+### Dashboards por Rol
+
+<table>
+    <tr>
+        <td width="33%">
+            <img src="docs/screenshots/screenshot_admin_dashboard.png" alt="Admin Dashboard">
+            <p align="center"><strong>Admin Dashboard</strong></p>
+        </td>
+        <td width="33%">
+            <img src="docs/screenshots/screenshot_hr_dashboard.png" alt="HR Dashboard">
+            <p align="center"><strong>HR Dashboard</strong></p>
+        </td>
+        <td width="33%">
+            <img src="docs/screenshots/screenshot_team_lead.png" alt="Team Lead Dashboard">
+            <p align="center"><strong>Team Lead Dashboard</strong></p>
+        </td>
+    </tr>
+</table>
 
 <!-- SECCION 4: FEATURES (analizar el contenido) -->
 Features principales
