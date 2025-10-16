@@ -9,10 +9,10 @@
         <div class="col-md-8 mb-4">
             <div class="card h-100">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-clock"></i> Recent Activity (Last 30 days)</h5>
+                    <h5 class="mb-0"><i class="fas fa-clock"></i> Recent Hires (Last 30 days)</h5>
                 </div>
                 <div class="card-body">
-                    {% if recent_hires_count > 0 %}
+                    {% if recent_hires_count %}
                         <p class="mb-3"><strong>{{ recent_hires_count }} new hire{{ recent_hires_count|pluralize }}</strong> in the last 30 days</p>
                         <div class="row">
                             {% for hire in recent_hires %}
@@ -26,6 +26,11 @@
                                     </div>
                                 </div>
                             {% endfor %}
+                            {% if recent_hires_count > 4 %}
+                                <div class="text-end mt-3">
+                                    <small class="text-muted">... and {{ recent_hires_count|add:"-4" }} more</small>
+                                </div>
+                            {% endif %}
                         </div>
                     {% else %}
                         <div class="text-center py-3">

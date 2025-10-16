@@ -134,9 +134,12 @@ class HRActivityService:
             hire_date__gte=recent_threshold
         ).select_related('user', 'role__department').order_by('-hire_date')
 
+        # Convertimos a lista para mostrar los primeros 4 y hacer un conteo sin tener n+1
+        recent_hires = list(recent_hires)
+
         result = {
-            'recent_hires': recent_hires,
-            'recent_hires_count': recent_hires.count(),
+            'recent_hires': recent_hires[:4],
+            'recent_hires_count': len(recent_hires),
         }
 
         # Cache por 30 minutos

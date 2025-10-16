@@ -84,8 +84,8 @@ class UserManagementService:
             date_joined__gte=recent_threshold
         ).select_related('employee').order_by('-date_joined')[:limit]
         
-        cache.set(cache_key, users, 600)
-        return users
+        cache.set(cache_key, list(users), 600)
+        return list(users)
     
 class EmployeeDashboardService:
     """Service para logica especifica de employee dashboard"""
@@ -102,6 +102,8 @@ class EmployeeDashboardService:
         try:
             employee = Employee.objects.select_related(
                 'role__department', 'manager__user'
+            ).prefetch_related(
+                'team_members'
             ).get(user=user)
 
             cache.set(cache_key, employee, 900)
@@ -113,20 +115,20 @@ class EmployeeDashboardService:
     def get_team_members(employee):
         """Obtener miembros del equipo si es team lead"""
         if not employee or not employee.is_team_lead:
-            return Employee.objects.none()
+            return []
         
         cache_key = f'team_members_{employee.id}'
         cached_result = cache.get(cache_key)
 
-        if cached_result is not None:
+        if cached_result:
             return cached_result
         
         team_members_list = Employee.objects.filter(
             manager=employee
         ).select_related('role__department', 'user')
 
-        cache.set(cache_key,team_members_list, 600)
-        return team_members_list
+        cache.set(cache_key, len(team_members_list), 600)
+        return list(team_members_list)
 
     @staticmethod
     def get_team_stats(team_members):
@@ -134,15 +136,15 @@ class EmployeeDashboardService:
 
         cache_key = 'team_stats'
         cached_result = cache.get(cache_key)
-        if cached_result is not None:
+        if cached_result:
             return cached_result
 
         total_members = len(team_members)
 
         seniorities = {
-            'JUNIOR':0,
-            'MID':0,
-            'SENIOR':0,
+            'JUNIOR': 0,
+            'MID': 0,
+            'SENIOR': 0,
         }
         for m in team_members:
             seniorities[m.seniority_level] += 1

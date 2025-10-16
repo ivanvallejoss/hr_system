@@ -309,8 +309,6 @@ class AdminDashboardView(SafeViewMixin, AdminRequiredMixin, TemplateView):
 
             # User Management Stats
             users_without_profile = UserManagementService.get_users_without_profile()
-            print("HOLA, LUGARN DE PRUEBA")
-            print(users_without_profile)
             group_distribution = UserManagementService.get_group_distribution()
             recent_users = UserManagementService.get_recent_users()
 
@@ -321,7 +319,7 @@ class AdminDashboardView(SafeViewMixin, AdminRequiredMixin, TemplateView):
                 'users_without_profile_count': len(users_without_profile),
 
                 # User Management
-                'users_without_profile': users_without_profile, # No entiendo porque pero top 5 para mostrar
+                'users_without_profile': users_without_profile[:5], # No entiendo porque pero top 5 para mostrar
                 'group_distribution': group_distribution,
                 'recent_users': recent_users,
 
@@ -337,18 +335,3 @@ class AdminDashboardView(SafeViewMixin, AdminRequiredMixin, TemplateView):
             messages.error(self.request, 'Error loading admin dashboard data.')
 
         return context
-    
-    def get_users_without_profile(self):
-        """Usuarios sin Employee profile asociado"""
-        return User.objects.filter(employee__isnull=True).select_related().order_by('-date_joined')
-    
-    def get_group_distribution(self):
-        """Distribucion de usuarios sin grupo"""
-        from django.db.models import Count;
-        return Group.objects.annotate(user_count=Count('user')).values('name', 'user_count')
-    
-    def get_recent_users(self):
-        """Usuarios creados en los ultimos 30 dias"""
-        from datetime import date, timedelta;  
-        a_month_ago = date.today() - timedelta(days=30)
-        return User.objects.filter(date_joined__gte=a_month_ago).order_by('-date_joined')[:10]
