@@ -14,6 +14,7 @@ Diseñado para gestionar empleados, departamentos, roles y jerarquías organizac
 <!-- SECCION 3: SCREENSHOTS + GIFS -->
 
 ## Vista Previa
+> Estos screenshots fueron tomadas luego de sembrar el sistema con un preset de 300 empleados para simular estadísticas realistas.
 <div align="center">
     <img src="docs/screenshots/screenshot_hr_dashboard.png" alt="System Overview" width="800">
     <p><em>Dashboard principal con metricas en tiempo real</em></p>
@@ -39,7 +40,7 @@ Diseñado para gestionar empleados, departamentos, roles y jerarquías organizac
 </table>
 
 <!-- SECCION 4: FEATURES (analizar el contenido) -->
-Features principales
+## Features principales
 ### Sistema de Roles y permisos.
 - *Admin*: Gestion total del sistema, control de usuarios y configuración.
 - *HR*: Gestion de empleados, departamentos y reportes estadísticos.
@@ -74,7 +75,7 @@ Features principales
 ### Backend.
 - **Framework** Django 5.2.4
 - **Database** PostgreSQL 15
-- **ORM** Django ORM con optimizacion de queries.
+- **ORM** Django con optimizacion de queries.
 - **Cache** Django Cache Framework.
 
 ### Testing & Quality.
@@ -96,9 +97,10 @@ Features principales
 - Git
 
 ### 1- Clonar el repositorio.
-'''bash
+```bash
 git clone https://github.com/ivanvallejoss/hr_system.git
 cd hr_system
+```
 
 ### 2- Crear y activar el entorno virtual.
 - Linux/macOS
@@ -110,18 +112,22 @@ python -m venv venv
 venv\Scripts\activate
 
 ### 3- Instalar Dependencias.
-pip install -r requirements.txt
+```pip install -r requirements.txt```
 
 ### 4- Configurar base de datos o variables de entorno.
 **OPCION A - Crear Base de datos Manualmente**
 
 -- Conectar a PostgreSQL.
+```bash
 psql -U postgres
+```
 
 -- Crear base de datos.
+``` sql
 CREATE DATABASE hr_system;
 CREATE USER hr_admin WITH PASSWORD 'tu_password_segura';
 GRANT ALL PRIVILEGES ON DATABASE hr_system to hr_admin;
+```
 
 **OPCION B - Usar variables de entorno**
 Crear archivo `.env` en la raiz del proyecto:
@@ -145,8 +151,7 @@ python -c 'from django.core.management.utils import get_random_secret_key; print
 ### 5- Ejecutar Migraciones.
 ``` bash
 python manage.py makemigrations
-```
-``` bash
+
 python manage.py migrate
 ```
 
