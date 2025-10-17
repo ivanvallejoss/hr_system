@@ -6,6 +6,7 @@ import factory
 from factory.django import DjangoModelFactory
 from faker import Faker
 from django.contrib.auth.models import User, Group
+from django.core.files.uploadedfile import SimpleUploadedFile
 from datetime import date, timedelta
 import random
 
@@ -124,6 +125,7 @@ class EmployeeFactory(DjangoModelFactory):
     )
     termination_date = None
     manager = None
+    profile_picture = None
     
     class Params:
         # Trait para empleado Junior
@@ -162,5 +164,15 @@ class EmployeeFactory(DjangoModelFactory):
         is_terminated = factory.Trait(
             termination_date=factory.LazyFunction(
                 lambda: date.today() - timedelta(days=random.randint(1, 180))
+            )
+        )
+
+        with_picture = factory.Trait(
+            profile_picture=factory.LazyFunction(
+                lambda: SimpleUploadedFile(
+                    name='test_profile.jpg',
+                    content=b'fake_image_content',
+                    content_type='image/jpg'
+                )
             )
         )

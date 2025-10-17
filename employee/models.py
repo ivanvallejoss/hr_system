@@ -1,5 +1,6 @@
 from django.db import models;
 from django.contrib.auth.models import User;
+from django.core.validators import FileExtensionValidator;
 from core.models import TimeStampedModel;
 from core.constants import SENIORITY_LEVELS;
 
@@ -47,6 +48,17 @@ class Employee(TimeStampedModel):
     current_salary = models.DecimalField(max_digits=10, decimal_places=2)
     hire_date = models.DateField()
     termination_date = models.DateField(null=True, blank=True)
+    profile_picture = models.ImageField(
+        upload_to='employee_profiles/%Y/%m/',
+        null=True,
+        blank=True,
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
+            )
+        ],
+        help_text="Profile Picture (JPG, PNG, WEBP). Max 2MB recommended."
+    )
 
     def __str__(self):
         return f"{self.user.get_full_name()} - {self.role.title}"
