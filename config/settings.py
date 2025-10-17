@@ -51,10 +51,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.middleware.SecurityHeadersMiddleware',
-    'core.middleware.EmployeeProfileMiddleware'
+    'core.middleware.EmployeeProfileMiddleware',
 ]
 
-# En caso de estar en el entorno de desarrollo de DEBUG, agregamos debug_toolbar como app instalada.
+## En caso de estar en el entorno de desarrollo de DEBUG: 
+# 1 - agregamos debug_toolbar como app instalada.
+# 2 - establecemos local storage para la subida de fotos y archivos.
 DEBUG = env('DEBUG')
 
 if DEBUG:
@@ -63,6 +65,27 @@ if DEBUG:
     import socket
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips ] + ["127.0.0.1", "10.0.2.2"] 
+    
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+
+
+## En caso de NO encontrarnos en ambiente de desarrollo:
+# 1- AGREGAMOS CLOUDINARY A LAS APPS PARA PRODUCCION.
+# 2- CONFIGURAMOS LAS VARIABLES DE ENTORNO PARA CLOUDINARY.
+if not DEBUG:
+    INSTALLED_APPS += ['cloudinary_storage', 'cloudinary',]
+
+    import cloudinary
+
+    cloudinary.config(
+        cloud_name=env('CLOUDINARY_CLOUD_NAME'),
+        api_key=env('CLOUDINARY_API_KEY'),
+        api_secret=env('CLOUDINARY_API_SECRET'),
+        secure=True
+    )
+
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 ROOT_URLCONF = 'config.urls'

@@ -9,7 +9,12 @@ logs/
 *.pot
 local_settings.py
 /static/
+
 /media/
+!/media/employee_profiles/
+/media/employee_profiles/*
+!/media/employee_profiles/.gitkeep
+
 htmlcov/
 .coverage
 .pytest_cache/

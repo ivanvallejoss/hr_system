@@ -8,9 +8,12 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')), 
 ]
 
-# Debug toolbar URLs solo en desarrollo
+# EN CASO DE ESTAR EN DESARROLLO:
+# 1- Agregamos Debug toolbar URLs.
+# 2- Agregamos MEDIA en local storage
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns = [
-        path('__debug__', include(debug_toolbar.urls)),
-    ] + urlpatterns
+    from django.conf.urls.static import static
+
+    urlpatterns.insert(0, path('__debug__/', include(debug_toolbar.urls)))
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
