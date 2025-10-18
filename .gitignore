@@ -18,4 +18,4 @@ local_settings.py
 htmlcov/
 .coverage
 .pytest_cache/
-staticfiles/
+/staticfiles/

@@ -8,12 +8,9 @@
             <div class="text-center mb-4">
                 {% include 'dashboards/partials/avatar.html' with employee=employee size='120' %}
                 <div class="mt-3">
-                    <button class="btn btn-sm btn-outline-primary" disabled>
+                    <a href="{% url 'employee:update_profile_picture' %}" class="btn btn-sm btn-outline-primary">
                         <i class="fas fa-camera"></i> Change Picture
-                    </button>
-                    <p class="text-muted small mb-0 mt-2">
-                        <em>Coming soon: Upload your profile picture</em>
-                    </p>
+                    </a>
                 </div>
             </div>
 

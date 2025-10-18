@@ -1,0 +1,107 @@
+{% extends 'dashboards/base.html' %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-camera"></i> Update Profile Picture
+                </h5>
+            </div>
+            <div class="card-body">
+                {# Preview actual #}
+                <div class="text-center mb-4">
+                    <h6 class="text-muted mb-3">Current Picture</h6>
+                    {% include 'dashboards/partials/avatar.html' with employee=employee size='150' %}
+                </div>
+
+                <hr>
+
+                {# Form en upload #}
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    {% csrf_token %}
+
+                    {# Errores generales del form #}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ form.non_field_errors }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+
+                    {# Campo de archivo #}
+                    <div class="mb-4">
+                        <label for="{{ form.profile_picture.id_for_label }}" class="form-label fw-bold">
+                            {{ form.profile_picture.label }}
+                        </label>
+
+                        {{ form.profile_picture }}
+
+                        {# Errores especificos del campo #}
+                        {% if form.profile_picture.errors %}
+                            <div class="text-danger small mt-2">
+                                {{ form.profile_picture.errors}}
+                            </div>
+                        {% endif %}
+
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Requirements:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Formats: JPG, PNG or WEBP</li>
+                                <li>Maximum size: 2 MB</li>
+                                <li>Minimum dimensions: 200x200 pixels</li>
+                                <li>Recommended: Square images work best</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    {# Preview de la imagen seleccionada (con JS) #}
+                    <div id="imagePreviewContainer" class="mb-4 text-center" style="display: none;">
+                        <h6 class="text-muted mb-3">Preview</h6>
+                        <img id="imagePreview" src="" alt="Preview"
+                        class="rounded-circle"
+                        style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #dee2e6;">
+                        <div class="mt-2">
+                            <small class="text-muted" id="imageInfo"></small>
+                        </div>
+                    </div>
+
+                    {# Botones de accion #}
+                    <div class="d-grip gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-upload"></i> Upload Picture
+                        </button>
+                        <a href="{% url 'dashboards:employee_dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {# Informacion adicional #}
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="fas fa-lightbulb text-warning"></i> Tips for a great profile picture
+                </h6>
+                <ul class="small mb-0">
+                    <li>Use a clear, recent photo of yourself.</li>
+                    <li>Make sure your face is clearly visible.</li>
+                    <li>Avoid group photos or photos with distracting backgrounds.</li>
+                    <li>Good lighting makes a big differences.</li>
+                    <li>Square format (1:1 ratio) works best for circular avatars.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {% load static %}
+    <script src="{% static 'employee/js/profile_picture_upload.js' %}"></script>
+{% endblock extra_js %}
