@@ -2,7 +2,6 @@ from django.shortcuts import redirect;
 from django.contrib.auth.decorators import login_required;
 from django.views.generic import TemplateView;
 from django.contrib import messages;
-from django.contrib.auth.models import User, Group;
 from employee.models import Employee;
 from .mixins import EmployeeContextMixin, HRContextMixin;
 from core.mixins import (
@@ -12,6 +11,7 @@ from core.mixins import (
     TeamLeadRequiredMixin,
     SafeViewMixin
 );
+from .services import DashboardRouter;
 from core.decorator import safe_view;
 import logging
 
@@ -31,8 +31,16 @@ def home_redirect(request):
 @login_required
 @safe_view('login')
 def dashboard_redirect(request):
+    """
+    Redirige al usuario al dashboard apropiado segun su rol.
+
+    Logica de routing:
+    1. Superuser -> Admin Dashboard
+    2. Grupos (Admin, HR, Team Lead) -> Dashboards especificos.
+    3. Employee -> Employee Dashboard
+    """
     try:
-        employee = Employee.objects.get(user=request.user)
+        employee = Employee.objects.select_related('role', 'user').get(user=request.user)
 
     # User existe pero no es empleado (ej: superuser)
     except Employee.DoesNotExist:
@@ -40,26 +48,14 @@ def dashboard_redirect(request):
             logger.info(f"Superuser {request.user.username} accessing admin dashboard")
             return redirect('dashboards:admin_dashboard')
         logger.warning(f"User {request.user.username} has no employee profile.")
-        messages.error(request, 'No employee profile found')
+        messages.error(request, 'No employee profile found. Contact HR or IT people.')
         return redirect('login')
     
-    #Logica hibrida: Groups + Employee data
-    user_groups = request.user.groups.values_list('name', flat=True)
+    # Usamos el router para determinar el dashboard al que pertenece
+    dashboard_url = DashboardRouter.get_dashboard_url(request.user, employee)
 
-    if 'Admin' in user_groups or request.user.is_superuser:
-        logger.info(f"Admin {request.user.username} accessing admin dashboard")
-        return redirect('dashboards:admin_dashboard')
-    
-    if 'HR' in user_groups:
-        logger.info(f"HR user {request.user.username} accessing HR dashboard")
-        return redirect('dashboards:hr_dashboard')
-    
-    elif employee.is_team_lead:
-        logger.info(f"Team Lead {request.user.username} accessing team lead dashboard")
-        return redirect('dashboards:team_lead_dashboard')
-    else:
-        logger.info(f"Employee {request.user.username} accessing employee dashboard")
-        return redirect('dashboards:employee_dashboard')
+    logger.info(f"User {request.user.username} redirected to {dashboard_url}")
+    return redirect(dashboard_url)
 
 
 #

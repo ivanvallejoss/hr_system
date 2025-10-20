@@ -180,7 +180,7 @@ class EmployeeDashboardService:
     
 
 import logging
-from core.exceptions import DataIntegrityError, EmployeeNotFoundError, InactiveEmployeeError, InsufficientPermissionError;
+from core.exceptions import EmployeeNotFoundError, InactiveEmployeeError, InsufficientPermissionError;
 
 logger = logging.getLogger(__name__)
 
@@ -231,3 +231,65 @@ class ValidationService:
             )
         return True
     
+#
+#   ROUTING
+# Service que sirve al acceso a Dashboards.
+# 
+
+class DashboardRouter:
+    """Servicio para determinar el dashboard apropiado segun rol."""
+
+    DASHBOARD_ROUTING = {
+        'Admin': 'dashboards:admin_dashboard',
+        'HR': 'dashboards:hr_dashboard',
+        'Team Lead': 'dashboards:team_lead_dashboard',
+    }
+
+    @classmethod
+    def get_dashboard_url(cls, user, employee=None):
+        """
+        Determina la URL del dashboard apropiado
+
+        Args:
+            user: Django User object
+            employee: Employee objects (opcional)
+        
+        Returns:
+            str: URL name del dashboard
+        """
+        user_groups = user.groups.values_list('name', flat=True)
+
+        # Verificar cada condicion en orden de prioridad.
+        if user.is_superuser:
+            return 'dashboards:admin_dashboard'
+        
+        for group_name in user_groups:
+            if group_name in cls.DASHBOARD_ROUTING:
+                return cls.DASHBOARD_ROUTING[group_name]
+            
+        if employee.is_team_lead:       # Mantenemos esta condicion hasta generar la logica para grupo de team lead
+            return 'dashboards:team_lead_dashboard' 
+        
+        return 'dashboards:employee_dashboard'
+    
+    @classmethod
+    def add_group_mapping(cls, group, group_dashboard):
+        """
+        Metodo para agregar grupos y rutas al diccionario de routing
+
+        Args:
+            group: nombre del grupo a agregar.
+            group_dashboard: dashboard al que va a apuntar el grupo
+
+        Returns:
+            No retorna ningun valor.
+        """
+        # Verificamos que el grupo no existe
+        if group in cls.DASHBOARD_ROUTING:
+            return None
+        
+        # Verificamos que el dashboard no existe
+        if group_dashboard in cls.DASHBOARD_ROUTING.values():
+            return None
+
+        cls.DASHBOARD_ROUTING[group] = group_dashboard
