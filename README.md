@@ -70,6 +70,10 @@ Diseñado para gestionar empleados, departamentos, roles y jerarquías organizac
 - Debug toolbar integrado (en modo desarrollo).
 - Presets de datos (small/medium/large).
 
+### Analytics.
+- Custom managers para analytics queries.
+- Todos los metodos son chainables y siguen los patrones Django estandar.
+
 <!-- SECCION 5: TECH STACK. -->
 ## Stack Tecnologico.
 ### Backend.
@@ -374,6 +378,29 @@ recently_hired = EmployeeFactory(recently_hired=True)
 terminated = EmployeeFactory(is_terminated=True)
 ```
 
+
+# Last Features Implemented.
+
+## Employee App
+
+### Analytics & Reporting
+
+Implementación de custom Managers en app Employee para queries de Analytics:
+``` python
+# Salary analytics
+top_raises = SalaryHistory.objects.by_year(2024).top_increases(10)
+monthly_stats = SalaryHistory.objects.by_month(2024)
+by_role = SalaryHistory.objects.avg_growth_by_role()
+
+# Role Analytics
+promotions = RoleHistory.objects.promotions_only()
+lateral_moves = RoleHistory.objects.lateral_moves_only()
+
+# Employee queries
+stale_employees = Employee.objects.active().without_recent_raise(monts=12)
+```
+
+Todos los metodos son chainables y siguen los patrones Django estandar.
 
 
 <!-- LICENCIA -->
