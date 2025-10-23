@@ -1,0 +1,164 @@
+{# employee/templates/employee/update_role.html #}
+{% extends 'dashboards/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        {# Form principal #}
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-tie"></i> Update Role/Seniority - {{ employee.full_name }}
+                </h5>
+            </div>
+            <div class="card-body">
+                
+                {# Info actual #}
+                <div class="alert alert-info">
+                    <h6 class="alert-heading">Current Information</h6>
+                    <ul class="mb-0">
+                        <li><strong>Employee:</strong> {{ employee.full_name }}</li>
+                        <li><strong>Current Role:</strong> {{ employee.role.title }}</li>
+                        <li><strong>Current Seniority:</strong> {{ employee.get_seniority_level_display }}</li>
+                        <li><strong>Department:</strong> {{ employee.role.department.name }}</li>
+                        <li><strong>Hire Date:</strong> {{ employee.hire_date|date:"F d, Y" }}</li>
+                    </ul>
+                </div>
+
+                {# Form #}
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {# Errores generales #}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    
+                    {# Campo: New Role #}
+                    <div class="mb-3">
+                        <label for="{{ form.new_role.id_for_label }}" class="form-label fw-bold">
+                            {{ form.new_role.label }}
+                        </label>
+                        {{ form.new_role }}
+                        {% if form.new_role.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.new_role.errors }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            {{ form.new_role.help_text }}
+                        </small>
+                    </div>
+                    
+                    {# Campo: New Seniority #}
+                    <div class="mb-3">
+                        <label for="{{ form.new_seniority.id_for_label }}" class="form-label fw-bold">
+                            {{ form.new_seniority.label }}
+                        </label>
+                        {{ form.new_seniority }}
+                        {% if form.new_seniority.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.new_seniority.errors }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            {{ form.new_seniority.help_text }}
+                        </small>
+                    </div>
+                    
+                    {# Campo: Effective Date #}
+                    <div class="mb-3">
+                        <label for="{{ form.effective_date.id_for_label }}" class="form-label fw-bold">
+                            {{ form.effective_date.label }}
+                        </label>
+                        {{ form.effective_date }}
+                        {% if form.effective_date.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.effective_date.errors }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            {{ form.effective_date.help_text }}
+                        </small>
+                    </div>
+                    
+                    {# Campo: Reason #}
+                    <div class="mb-3">
+                        <label for="{{ form.reason.id_for_label }}" class="form-label fw-bold">
+                            {{ form.reason.label }}
+                        </label>
+                        {{ form.reason }}
+                        {% if form.reason.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.reason.errors }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            {{ form.reason.help_text }}
+                        </small>
+                    </div>
+                    
+                    {# Botones #}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-check"></i> Update Role/Seniority
+                        </button>
+                        <a href="{% url 'dashboards:hr_dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        {# History sidebar #}
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-history"></i> Recent Role History
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if recent_role_history %}
+                    <ul class="list-unstyled">
+                        {% for history in recent_role_history %}
+                            <li class="mb-3 pb-3 border-bottom">
+                                <div>
+                                    <strong>{{ history.old_role.title }}</strong> / {{ history.old_seniority }}
+                                    →
+                                    <strong>{{ history.new_role.title }}</strong> / {{ history.new_seniority }}
+                                </div>
+                                <div class="mt-1">
+                                    {% if history.is_promotion %}
+                                        <span class="badge bg-success">Promotion</span>
+                                    {% elif history.is_lateral_move %}
+                                        <span class="badge bg-info">Lateral Move</span>
+                                    {% elif history.is_demotion %}
+                                        <span class="badge bg-warning">Demotion</span>
+                                    {% endif %}
+                                    
+                                    {% if history.changed_department %}
+                                        <span class="badge bg-secondary">Dept Change</span>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">
+                                    {{ history.effective_date|date:"M d, Y" }}
+                                    {% if history.change_reason %}
+                                        <br>{{ history.change_reason }}
+                                    {% endif %}
+                                </small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">No role history available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

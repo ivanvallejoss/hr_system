@@ -281,6 +281,20 @@ class TeamLeadDashboardViewTest(TestCase):
         self.assertEqual(len(context['team_table_data']), 3)
 
 
+    def test_team_lead_dashboard_no_n_plus_1(self):
+        """Verificar que no hay N+1 queries"""
+        from django.db import connection;
+        from django.test.utils import CaptureQueriesContext;
+        self.client.login(username='teamlead', password='testpass123')
+
+        with CaptureQueriesContext(connection) as queries:
+            response =  self.client.get(reverse('dashboards:team_lead_dashboard'))
+
+        print(len(queries))
+        self.assertLess(len(queries), 12,
+                        f"Too many queries, {len(queries)}. Possible N+1 problem")
+
+
 class PermissionMixinTest(TestCase):
     """Tests para los mixins de permisos"""
     

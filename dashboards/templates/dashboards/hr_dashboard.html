@@ -18,6 +18,9 @@
                             {% for hire in recent_hires %}
                                 <div class="col-md-6 mb-2">
                                     <div class="card border-light">
+                                        <div class="text-center">
+                                            {% include 'dashboards/partials/avatar.html' with employee=hire size='75' %}
+                                        </div>
                                         <div class="card-body py-2">
                                             <h6 class="card-title mb-1">{{ hire.full_name }}</h6>
                                             <small class="text-muted">{{ hire.role.title }} - {{ hire.role.department.name }}</small><br>

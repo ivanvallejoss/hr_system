@@ -497,7 +497,12 @@ class RoleHistory(TimeStampedModel):
         seniority_order = {'JUNIOR': 1, 'MID': 2, 'SENIOR': 3}
         old_level = seniority_order.get(self.old_seniority, 0)
         new_level = seniority_order.get(self.new_seniority, 0)
-        return "promotion" if new_level > old_level else "demotion"
+        if new_level > old_level:
+            return 'promotion'
+        elif old_level > new_level:
+            return 'promotion'
+        else:
+            return None
     
     @property
     def is_lateral_move(self):

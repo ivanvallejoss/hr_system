@@ -137,10 +137,10 @@ class RoleHistoryAdmin(admin.ModelAdmin):
         'new_role',
         'old_seniority',
         'new_seniority',
-        'change_by',
+        'changed_by',
         'change_reason',
         'effective_date',
-        'change_typo_display',
+        'change_type_display',
         'created_at',
         'updated_at',
         'department_change_display'

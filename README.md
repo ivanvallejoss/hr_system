@@ -379,7 +379,7 @@ terminated = EmployeeFactory(is_terminated=True)
 ```
 
 
-# Last Features Implemented.
+# Latest Features Implemented.
 
 ## Employee App
 
