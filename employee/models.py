@@ -52,6 +52,7 @@ class Employee(TimeStampedModel):
     current_salary = models.DecimalField(max_digits=10, decimal_places=2)
     hire_date = models.DateField()
     termination_date = models.DateField(null=True, blank=True)
+
     profile_picture = models.ImageField(
         upload_to='employee_profiles/%Y/%m/',
         null=True,
@@ -63,6 +64,7 @@ class Employee(TimeStampedModel):
         ],
         help_text="Profile Picture (JPG, PNG, WEBP). Max 2MB recommended."
     )
+
     objects = models.Manager.from_queryset(EmployeeQuerySet)()
 
     def update_salary(self, new_salary, changed_by, reason='', effective_date=None):
@@ -294,6 +296,24 @@ class Employee(TimeStampedModel):
     @property
     def is_team_lead(self):
         return self.team_members.exists()
+    
+    def sync_team_lead_group(self):
+        """ 
+        Sincroniza el estado de team leado con el grupo Team Lead.
+        Debe llamarse despues de cambios en managers.
+        """
+        from django.contrib.auth.models import Group
+
+        team_lead_group, _ = Group.objects.get_or_create(name='Team_Lead')
+
+        if self.is_team_lead:
+            # Agregar al grupo si no esta
+            if not self.user.groups.filter(name='Team_Lead').exists():
+                self.user.groups.add(team_lead_group)
+        else:
+            # Remover del grupo si ya no es team lead
+            if self.user.groups.filter(name='Team_Lead').exists():
+                self.user.groups.remove(team_lead_group)
     
     @property
     def full_name(self):

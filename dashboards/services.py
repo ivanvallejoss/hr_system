@@ -242,7 +242,7 @@ class DashboardRouter:
     DASHBOARD_ROUTING = {
         'Admin': 'dashboards:admin_dashboard',
         'HR': 'dashboards:hr_dashboard',
-        'Team Lead': 'dashboards:team_lead_dashboard',
+        'Team_Lead': 'dashboards:team_lead_dashboard',
     }
 
     @classmethod
@@ -266,9 +266,6 @@ class DashboardRouter:
         for group_name in user_groups:
             if group_name in cls.DASHBOARD_ROUTING:
                 return cls.DASHBOARD_ROUTING[group_name]
-            
-        if employee.is_team_lead:       # Mantenemos esta condicion hasta generar la logica para grupo de team lead
-            return 'dashboards:team_lead_dashboard' 
         
         return 'dashboards:employee_dashboard'
     
