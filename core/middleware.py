@@ -22,6 +22,9 @@ class EmployeeProfileMiddleware:
             '/admin/',
             '/accounts/',
             '/logout/',
+            '/static/',
+            '/media/',
+            '/__debug__/',
             reverse('dashboards:admin_dashboard'),
         ]
 
