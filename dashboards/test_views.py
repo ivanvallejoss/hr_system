@@ -287,12 +287,23 @@ class TeamLeadDashboardViewTest(TestCase):
         from django.test.utils import CaptureQueriesContext;
         self.client.login(username='teamlead', password='testpass123')
 
+        for i in range(20):
+            subordinate = User.objects.create_user(username=f'scalemember_new{i}')
+            Employee.objects.create(
+                user=subordinate,
+                role=self.role,
+                manager=self.team_lead,
+                current_salary=60000,
+                hire_date=date.today()
+            )
+
         with CaptureQueriesContext(connection) as queries:
             response =  self.client.get(reverse('dashboards:team_lead_dashboard'))
 
-        print(len(queries))
+        query_count = len(queries)
+        print(query_count)
         self.assertLess(len(queries), 12,
-                        f"Too many queries, {len(queries)}. Possible N+1 problem")
+                        f"Queries escalaron con team size: {query_count}")
 
 
 class PermissionMixinTest(TestCase):
