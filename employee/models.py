@@ -173,7 +173,8 @@ class Employee(TimeStampedModel):
             employee=self,
             old_role=self.role,
             new_role=new_role,
-            old_seniority=new_seniority,
+            old_seniority=self.seniority_level,
+            new_seniority=new_seniority,
             changed_by=changed_by,
             change_reason=reason,
             effective_date=effective_date
