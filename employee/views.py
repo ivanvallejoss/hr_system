@@ -252,7 +252,7 @@ class EmployeeSearchView(SafeViewMixin, ListView):
     model = Employee
     template_name = 'employee/employee_search.html'
     context_object_name = 'employees'
-    paginate_by = 20
+    paginate_by = 9
     fallback_url = reverse_lazy('dashboards:hr_dashboard')
 
     def get_queryset(self):

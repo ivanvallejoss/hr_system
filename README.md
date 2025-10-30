@@ -393,25 +393,38 @@ monthly_stats = SalaryHistory.objects.by_month(2024)
 by_role = SalaryHistory.objects.avg_growth_by_role()
 
 # Role Analytics
+# Nos dice cuantas promociones se realizaron o, 
+# cuantos movimientos laterales (cambios de departamento sin promocion)
 promotions = RoleHistory.objects.promotions_only()
 lateral_moves = RoleHistory.objects.lateral_moves_only()
 
 # Employee queries
+# Empleados que no hayan recibido aumento en el ultimo year
 stale_employees = Employee.objects.active().without_recent_raise(monts=12)
 ```
 
 Todos los metodos son chainables y siguen los patrones Django estandar.
 
+## HR Dashboard
+
+### Search for employees
+
+Implementación de búsqueda de empleados por nombre, apellido o username para su propia edición.
+
+ - Paginacion de a 9 empleados para una vista de pantalla completa.
+ - Busqueda de empleados por usuario, nombre o apellido.
+ - Permite la edición de rol y salario.
 
 <!-- LICENCIA -->
 
 ## 📄 Licencia
 
-Este proyecto está bajo la licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
+Este proyecto utiliza la licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
 
 MIT License permite uso comercial, modificación y distribución del código.
 
 
+pd: usalo como te parezca, pero dejame una estrella
 <!-- CONTACTO -->
 
 ## Autor
