@@ -431,7 +431,7 @@ pd: usalo como te parezca, pero dejame una estrella
 
 ## Autor
 
-**[Tu Nombre Completo]**
+** Ivan Vallejos**
 
 - 💼 LinkedIn: [linkedin.com/in/ivanvallejoss](https://linkedin.com/in/ivanvallejoss)
 - 📧 Email: ivanvallejos06@gmail.com
