@@ -257,13 +257,14 @@ if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     
     # En produccion, usar DATABASE_URL si esta disponible
-    database_url = env.get_value('DATABASE_URL', default=None)
-    if database_url:
-        DATABASES['default'] = dj_database_url.config(
-            default=database_url,
-            conn_max_age=600,
-            conn_health_checks=True
-            )
+    # database_url = env.get_value('DATABASE_URL', default=None)
+    # if database_url:
+    #     DATABASES['default'] = dj_database_url.config(
+    #         default=database_url,
+    #         conn_max_age=600,
+    #         conn_health_checks=True
+    #         )
+    DATABASES['default'] = dj_database_url.config(os.environ.get('DATABASE_URL', conn_max_age=1000))
     CSRF_TRUSTED_ORIGINS = ['http://*', 
                             'https://web-production-219e3.up.railway.app/',
                             'https://*.railway.app']
