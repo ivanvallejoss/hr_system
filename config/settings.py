@@ -264,7 +264,7 @@ if not DEBUG:
     #         conn_max_age=600,
     #         conn_health_checks=True
     #         )
-    DATABASES['default'] = dj_database_url.config(os.environ.get('DATABASE_URL', conn_max_age=1000))
+    DATABASES['default'] = dj_database_url.config(os.environ.get('DATABASE_URL'), conn_max_age=1000, conn_health_checks=True)
     CSRF_TRUSTED_ORIGINS = ['http://*', 
                             'https://web-production-219e3.up.railway.app/',
                             'https://*.railway.app']
