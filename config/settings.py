@@ -265,6 +265,8 @@ if not DEBUG:
             conn_health_checks=True
             )
 
+CSRF_TRUSTED_ORIGINS = ['http://*', 'https://web-production-219e3.up.railway.app/']
+
 ## En caso de NO encontrarnos en ambiente de desarrollo:
 # 1- AGREGAMOS CLOUDINARY A LAS APPS PARA PRODUCCION.
 # 2- CONFIGURAMOS LAS VARIABLES DE ENTORNO PARA CLOUDINARY.
