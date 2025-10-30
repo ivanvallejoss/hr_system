@@ -2,7 +2,13 @@
 
 {% block content %}
     {% include 'dashboards/partials/dashboard_header.html' with dashboard_title="HR Management Dashboard" dashboard_subtitle="Welcome back, "|add:hr_user.get_full_name|default:hr_user.username|add:" | Manage your workforce efficiently" %}
-
+    <div class="py-3">
+        <div class="mv-4">
+            <a href="{% url 'employee:search' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-search"></i> Search & Manage Employees
+            </a>
+        </div>
+    </div>
     <div class="row">
         {% include 'dashboards/partials/stats_card.html' with card_size="4" card_title="Company Overview" card_icon="fas fa-building" header_bg_class="bg-primary" card_type="overview" stats_data=company_overview_data %}
         

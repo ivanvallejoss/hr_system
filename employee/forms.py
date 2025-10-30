@@ -230,7 +230,7 @@ class UpdateRoleForm(forms.Form):
     Permite cambiar role, seniority o ambas.
     """
     new_role = forms.ModelChoiceField(
-        queryset=Role.objects.select_related('de[artment]').all(),
+        queryset=Role.objects.select_related('department').all(),
         widget=forms.Select(attrs={
             'class': 'form-control'
         }),
@@ -276,7 +276,7 @@ class UpdateRoleForm(forms.Form):
         Args:
             employee: Employee instance
         """
-        super().get__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.employee = employee
 
         # Si tenemos employee, mostrar valores actuales

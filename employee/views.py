@@ -1,6 +1,6 @@
 import logging;
 from django.shortcuts import redirect, get_object_or_404;
-from django.views.generic import UpdateView, FormView;
+from django.views.generic import UpdateView, FormView, ListView;
 from django.urls import reverse_lazy, reverse;
 from django.core.exceptions import ValidationError;
 from core.decorator import group_required;
@@ -233,3 +233,60 @@ class UpdateEmployeeRoleView(SafeViewMixin, FormView):
     def get_success_url(self):
         """Redirigir al HR dashboard"""
         return reverse('dashboards:hr_dashboard')
+
+#
+#  View de Busqueda
+# 
+
+from django.views.generic import ListView;
+from django.db.models import Q
+
+@method_decorator(group_required('HR'), name='dispatch')
+class EmployeeSearchView(SafeViewMixin, ListView):
+    """
+    View para buscar empleados
+
+    Permite a HR buscar empleados nombre o username
+    y acceder a las opciones de actualizacion
+    """
+    model = Employee
+    template_name = 'employee/employee_search.html'
+    context_object_name = 'employees'
+    paginate_by = 20
+    fallback_url = reverse_lazy('dashboards:hr_dashboard')
+
+    def get_queryset(self):
+        """ 
+        Retorna empleados activos, filtrados por busqueda si existe
+        """
+        queryset = Employee.objects.select_related(
+            'user', 'role', 'role__department'
+        ).filter(
+            termination_date__isnull=True
+        ).order_by('user__last_name', 'user__first_name')
+
+        # Obtenemos la query de busqueda
+        query = self.request.GET.get('q', '').strip()
+
+        if query:
+            # Buscamos por nombre, apellido o username
+            queryset = queryset.filter(
+                Q(user__first_name__icontains=query) |
+                Q(user__last_name__icontains=query) |
+                Q(user__username__icontains=query) 
+            )
+
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q', '')
+        # Utilizamos el paginator.
+        # Para hacer el conteo del total de empleados activos.
+        if context.get('is_paginated'):
+            context['total_results'] = context['paginator'].count
+        else:
+            # Esto ejecuta el queryset ya ejecutado, posible N+1 queries
+            context['total_results'] = len(context['employees'])
+        
+        return context
