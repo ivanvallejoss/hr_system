@@ -23,7 +23,9 @@ env = environ.Env(
 # leer archivo en .env
 environ.Env.read_env(BASE_DIR / '.env')
 
-
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 SECRET_KEY = env('SECRET_KEY')
 
@@ -68,24 +70,6 @@ if DEBUG:
     
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
-
-
-## En caso de NO encontrarnos en ambiente de desarrollo:
-# 1- AGREGAMOS CLOUDINARY A LAS APPS PARA PRODUCCION.
-# 2- CONFIGURAMOS LAS VARIABLES DE ENTORNO PARA CLOUDINARY.
-if not DEBUG:
-    INSTALLED_APPS += ['cloudinary_storage', 'cloudinary',]
-
-    import cloudinary
-
-    cloudinary.config(
-        cloud_name=env('CLOUDINARY_CLOUD_NAME'),
-        api_key=env('CLOUDINARY_API_KEY'),
-        api_secret=env('CLOUDINARY_API_SECRET'),
-        secure=True
-    )
-
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 ROOT_URLCONF = 'config.urls'
@@ -260,28 +244,40 @@ LOGGING = {
 # creamos directorio de logs si no existe
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
 
-
 #
 # ==== PRODUCTION SETTINGS ====
 #
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+import dj_database_url
 
 # Whitenoise configuration (para servir archivos estaticos)
+# Database configuration con dj-database-url (para Railway/Render)
 if not DEBUG:
     MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Database configuration con dj-database-url (para Railway/Render)
-import dj_database_url
-
-if not DEBUG:
+    
     # En produccion, usar DATABASE_URL si esta disponible
     database_url = env.get_value('DATABASE_URL', default=None)
     if database_url:
         DATABASES['default'] = dj_database_url.config(
             default=database_url,
             conn_max_age=600,
-            conn_health_checks=True        )
+            conn_health_checks=True
+            )
+
+## En caso de NO encontrarnos en ambiente de desarrollo:
+# 1- AGREGAMOS CLOUDINARY A LAS APPS PARA PRODUCCION.
+# 2- CONFIGURAMOS LAS VARIABLES DE ENTORNO PARA CLOUDINARY.
+# if not DEBUG:
+#     INSTALLED_APPS += ['cloudinary_storage', 'cloudinary',]
+
+#     import cloudinary
+
+#     cloudinary.config(
+#         cloud_name=env('CLOUDINARY_CLOUD_NAME'),
+#         api_key=env('CLOUDINARY_API_KEY'),
+#         api_secret=env('CLOUDINARY_API_SECRET'),
+#         secure=True
+#     )
+
+#     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
