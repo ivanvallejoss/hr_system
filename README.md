@@ -1,8 +1,9 @@
 <!-- SECCION 1: HEADER + DESCRIPCION -->
-# HR Management System. Django + PostgreSQL + Railway
+# HR Management System. 
+## Django + PostgreSQL + Railway
 > Sistema integral de gestión de recursos humanos con arquitectura multi-role y sistema jerárquico de permisos.
 Diseñado para gestionar empleados, departamentos, roles y jerarquías organizacionales. Implementa dashboards diferenciados según el rol del usuario (Admin, HR, Team Lead, Employee) con métricas en tiempo real y herramientas de gestión específicas para cada nivel.
-## 🔗[Demo funcionando en Railway] (https://hr-management-sys.up.railway.app)
+## [🔗 Demo funcionando en Railway] (https://hr-management-sys.up.railway.app)
 
 <!-- SECCION 2: BADGES (analizar su iplementacion) -->
 ![Django](https://img.shields.io/badge/Django-5.2.4-green?logo=django)
