@@ -412,8 +412,9 @@ Todos los metodos son chainables y siguen los patrones Django estandar.
 Implementación de búsqueda de empleados por nombre, apellido o username para su propia edición.
 
  - Paginacion de a 9 empleados para una vista de pantalla completa.
- - Busqueda de empleados por usuario, nombre o apellido.
- - Permite la edición de rol y salario.
+ - Busqueda de empleados mediante case-insensitive (no se ve afectada la busqueda por mayusculas o minusculas).
+ - Permite la edición de rol y salario sobre empleados ACTIVOS.
+ - Se utilizó `paginator.count` para el conteo del total de registros encontrados.
 
 <!-- LICENCIA -->
 

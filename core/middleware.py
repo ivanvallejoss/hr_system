@@ -53,7 +53,7 @@ class EmployeeProfileMiddleware:
                     return HttpResponseRedirect(reverse('login'))
                 except Exception as e:
                     logger.error(f"Error in EmployeeProfileMiddleware: {str(e)}")
-                    # No bloquear en caso de error inesperado, pero registrarlo
+                    # No bloqueamos en caso de error inesperado, pero registrarlo
                     pass
             
         response = self.get_response(request)
